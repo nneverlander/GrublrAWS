@@ -37,17 +37,18 @@ public class FoodHandler {
     @Produces(MediaType.TEXT_HTML)
     @Path("share")
     public Response shareFood(@FormDataParam(Constants.METADATA) String metadata, @FormDataParam(Constants.FILE) InputStream image) {
-        JsonNode entityObj = Utils.stringToJson(metadata);
-        //Store photo in cloud storage
-        String name = Utils.generateUniqueString(entityObj.get(Constants.NAME).asText());
+        if (log.isLoggable(Level.INFO)) log.info("Share food req received");
         try {
+            JsonNode entityObj = Utils.stringToJson(metadata);
+            //Store photo in cloud storage
+            String name = Utils.generateUniqueString(entityObj.get(Constants.NAME).asText());
             DataHandlerFactory.getDefaultPhotoHandler().writePhoto(name, ByteStreams.toByteArray(image));
             // Store metadata in data store
             DataHandlerFactory.getDefaultDataStoreHandler().writeData(name, entityObj);
             //return url
             return Response.ok().build();
         } catch (Exception e) {
-            log.severe(e.getCause() + e.getMessage() + e.toString());
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -57,11 +58,12 @@ public class FoodHandler {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path("find")
     public Response findFood(String location) {
+        if (log.isLoggable(Level.INFO)) log.info("Find food req received");
         Response ret = Response.ok().build();
         try {
             JsonNode locationObj = Utils.stringToJson(location);
             List<JsonNode> posts = DataHandlerFactory.getDefaultDataStoreHandler().readData(locationObj);
-            if (posts.isEmpty()) {
+            if (posts == null || posts.isEmpty()) {
                 if (log.isLoggable(Level.INFO)) log.info("No posts to show");
                 ret = Response.ok().entity("No posts").build();
             } else {
@@ -82,7 +84,7 @@ public class FoodHandler {
                 }
             }
         } catch (Exception e) {
-            log.severe(e.getCause() + e.getMessage() + e.toString());
+            log.log(Level.SEVERE, e.getMessage(), e);
             ret = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
         return Response.fromResponse(ret).build();

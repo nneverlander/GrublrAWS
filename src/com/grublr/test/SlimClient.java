@@ -27,8 +27,9 @@ public class SlimClient {
     }
 
     private static void shareFood() {
-        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
-        String share = fileToString("/home/adi/Projects/Grublr/share.json");
+        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        String TARGET_URL = "http://localhost:8080/r/food/share";
+        String share = fileToString("/home/adi/Projects/GrublrAWS/share.json");
 
         Client client = ClientBuilder.newBuilder()
                 .register(MultiPartFeature.class).build();
@@ -50,7 +51,7 @@ public class SlimClient {
     private static void findFood() {
         //String TARGET_URL = "https://grublr.elasticbeanstalk.com/r/food/find";
         String TARGET_URL = "http://localhost:8080/r/food/find";
-        String find = fileToString("/home/adi/Projects/Grublr/find.json");
+        String find = fileToString("/home/adi/Projects/GrublrAWS/find.json");
 
         Client client = ClientBuilder.newBuilder().build();
         WebTarget webTarget = client.target(TARGET_URL);

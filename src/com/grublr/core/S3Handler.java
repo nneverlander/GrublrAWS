@@ -19,6 +19,19 @@ import java.util.logging.Logger;
  */
 public class S3Handler implements PhotoHandler {
 
+    private S3Handler() {
+
+    }
+
+    private static S3Handler instance;
+
+    public static final S3Handler getInstance() {
+        if (instance == null) {
+            instance = new S3Handler();
+        }
+        return instance;
+    }
+
     private static final Logger log = Logger.getLogger(S3Handler.class.getName());
     private static final AmazonS3 s3Client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
     private static final TransferManager transferMgr = new TransferManager(new InstanceProfileCredentialsProvider());
@@ -31,7 +44,8 @@ public class S3Handler implements PhotoHandler {
             transferMgr.upload(Constants.S3_BUCKET, name, new ByteArrayInputStream(image), null);
             if (log.isLoggable(Level.INFO)) log.info("Writing photo to S3 complete");
         } catch (Exception e) {
-            log.severe(e.getCause() + e.getMessage() + e.toString());
+            log.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -44,8 +58,7 @@ public class S3Handler implements PhotoHandler {
             if (log.isLoggable(Level.INFO)) log.info("Read photo from S3");
             return ByteStreams.toByteArray(stream);
         } catch (Exception e) {
-            log.severe(e.getCause() + e.getMessage() + e.toString());
+            throw e;
         }
-        return null;
     }
 }

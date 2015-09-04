@@ -2,12 +2,12 @@ package com.grublr.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -18,13 +18,12 @@ public class Utils {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final Logger log = Logger.getLogger(Utils.class.getName());
 
-    public static JsonNode stringToJson(String str) {
+    public static JsonNode stringToJson(String str) throws IOException {
         try {
             return mapper.readTree(str);
         } catch (IOException e) {
-            log.severe(e.getCause() + e.getMessage() + e.toString());
+            throw e;
         }
-        return null;
     }
 
     public static void sysout(Object... obj) {
@@ -33,22 +32,22 @@ public class Utils {
         }
     }
 
-    public static Properties readProps(String fileName) {
+    public static Properties readProps(String fileName) throws IOException {
         Properties props = new Properties();
         InputStream input = null;
         try {
-            input = new FileInputStream(fileName);
+            input = Utils.class.getClassLoader().getResourceAsStream(fileName);
             // load a properties file
             props.load(input);
 
         } catch (IOException e) {
-            log.severe(e.getCause() + e.getMessage() + e.toString());
+            log.log(Level.SEVERE, e.getMessage(), e);
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    log.severe(e.getCause() + e.getMessage() + e.toString());
+                    throw e;
                 }
             }
         }

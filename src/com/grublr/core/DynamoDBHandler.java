@@ -20,7 +20,6 @@ import com.grublr.util.Constants;
 import com.grublr.util.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,19 @@ import java.util.logging.Logger;
  */
 public class DynamoDBHandler implements DataStoreHandler {
 
+    private DynamoDBHandler() {
+
+    }
+
+    private static DynamoDBHandler instance;
+
+    public static final DynamoDBHandler getInstance() {
+        if (instance == null) {
+            instance = new DynamoDBHandler();
+        }
+        return instance;
+    }
+
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
     private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
     private static final DynamoDB dynamoDB = new DynamoDB(dbClient);
@@ -42,7 +54,7 @@ public class DynamoDBHandler implements DataStoreHandler {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void writeData(String associatedImageName, JsonNode jsonData) {
+    public void writeData(String associatedImageName, JsonNode jsonData) throws IOException, JSONException {
         long begin = System.currentTimeMillis();
         if (log.isLoggable(Level.INFO)) log.info("Storing metadata");
         try {
@@ -50,12 +62,12 @@ public class DynamoDBHandler implements DataStoreHandler {
             if (log.isLoggable(Level.INFO))
                 log.info("Stored metadata and time taken: " + (System.currentTimeMillis() - begin));
         } catch (Exception e) {
-            log.severe(e.getCause() + e.getMessage() + e.toString());
+            throw e;
         }
     }
 
     @Override
-    public List<JsonNode> readData(JsonNode location) {
+    public List<JsonNode> readData(JsonNode location) throws IOException, JSONException {
         long begin = System.currentTimeMillis();
         if (log.isLoggable(Level.INFO)) log.info("Getting posts");
         try {
@@ -65,13 +77,12 @@ public class DynamoDBHandler implements DataStoreHandler {
                 log.info("Got metadata and time taken: " + (System.currentTimeMillis() - begin));
             return posts;
         } catch (Exception e) {
-            log.severe(e.getCause() + e.getMessage() + e.toString());
+            throw e;
         }
-        return Collections.emptyList();
     }
 
     private void putPoint(String associatedImageName, JsonNode node) throws IOException, JSONException {
-        GeoPoint geoPoint = new GeoPoint(node.get(Constants.LATITUDE).doubleValue(), node.get(Constants.LOCATION).doubleValue());
+        GeoPoint geoPoint = new GeoPoint(node.get(Constants.LATITUDE).doubleValue(), node.get(Constants.LONGITUDE).doubleValue());
         AttributeValue rangeKeyAttributeValue = new AttributeValue().withS(UUID.randomUUID().toString());
         PutPointRequest putPointRequest = new PutPointRequest(geoPoint, rangeKeyAttributeValue);
         Iterator<Map.Entry<String, JsonNode>> iter = node.fields();

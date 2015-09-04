@@ -13,7 +13,7 @@ public class Constants {
     public static final String URL = "url";
     public static final String ENTITY_KIND = "Metadata";
     public static final String LATITUDE = "lat";
-    public static final String LONGITUDE = "long";
+    public static final String LONGITUDE = "lon";
     public static final String METADATA = "metadata";
     public static final String FILE = "file";
     public static final String SEARCH_RADIUS_IN_METERS = "radius";
