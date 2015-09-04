@@ -11,7 +11,6 @@ public class Constants {
     public static final String UNIQUE_NAME = "unique_name";
     public static final String DESCRIPTION = "desc";
     public static final String URL = "url";
-    public static final String ENTITY_KIND = "Metadata";
     public static final String LATITUDE = "lat";
     public static final String LONGITUDE = "lon";
     public static final String METADATA = "metadata";
