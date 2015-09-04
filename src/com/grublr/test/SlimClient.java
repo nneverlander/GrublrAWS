@@ -27,7 +27,7 @@ public class SlimClient {
     }
 
     private static void shareFood() {
-        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
         String TARGET_URL = "http://localhost:8080/r/food/share";
         String share = fileToString("/home/adi/Projects/GrublrAWS/share.json");
 

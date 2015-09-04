@@ -36,7 +36,7 @@ public class Utils {
         Properties props = new Properties();
         InputStream input = null;
         try {
-            input = Utils.class.getClassLoader().getResourceAsStream(fileName);
+            input = Utils.class.getResourceAsStream("/" + fileName);
             // load a properties file
             props.load(input);
 
