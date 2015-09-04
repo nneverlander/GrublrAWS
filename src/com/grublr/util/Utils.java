@@ -38,17 +38,6 @@ public class Utils {
         try {
             input = Utils.class.getResourceAsStream("/" + fileName);
 
-            for (int i = 0; i < 10; i++) {
-                int vnt = 1;
-                vnt++;
-                log.info(vnt + " ");
-            }
-
-            System.out.println(Utils.class.getResource(fileName));
-            System.out.println(Utils.class.getResource("/" + fileName));
-            System.out.println(Utils.class.getClassLoader().getResource(fileName));
-
-
             //log.severe(Utils.class.getResource(fileName).toString());
             log.severe(Utils.class.getResource("/" + fileName).toString());
             log.severe(Utils.class.getClassLoader().getResource(fileName).toString());
