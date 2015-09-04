@@ -37,6 +37,29 @@ public class Utils {
         InputStream input = null;
         try {
             input = Utils.class.getResourceAsStream("/" + fileName);
+
+            for (int i = 0; i < 10; i++) {
+                int vnt = 1;
+                vnt++;
+                log.info(vnt + " ");
+            }
+
+            System.out.println(Utils.class.getResource(fileName));
+            System.out.println(Utils.class.getResource("/" + fileName));
+            System.out.println(Utils.class.getClassLoader().getResource(fileName));
+
+
+            //log.severe(Utils.class.getResource(fileName).toString());
+            log.severe(Utils.class.getResource("/" + fileName).toString());
+            log.severe(Utils.class.getClassLoader().getResource(fileName).toString());
+
+            //log.info(Utils.class.getResource(fileName).toString());
+            log.info(Utils.class.getResource("/" + fileName).toString());
+            log.info(Utils.class.getClassLoader().getResource(fileName).toString());
+
+            System.out.println(Utils.class.getClassLoader().getResource("/" + fileName));
+            log.severe(Utils.class.getClassLoader().getResource("/" + fileName).toString());
+
             // load a properties file
             props.load(input);
 
