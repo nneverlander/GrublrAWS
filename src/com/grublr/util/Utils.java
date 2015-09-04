@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -26,7 +28,7 @@ public class Utils {
     }
 
     public static void sysout(Object... obj) {
-        for(Object o : obj) {
+        for (Object o : obj) {
             System.out.println(o.toString());
         }
     }
@@ -53,4 +55,7 @@ public class Utils {
         return props;
     }
 
+    public static String generateUniqueString(String str) {
+        return str + Calendar.getInstance().getTimeInMillis() + "-" + UUID.randomUUID();
+    }
 }

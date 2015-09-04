@@ -9,6 +9,7 @@ import java.util.List;
 public interface DataStoreHandler extends DataHandler {
 
     void writeData(String associatedImageName, JsonNode jsonData);
+
     List<JsonNode> readData(JsonNode inputJson);
 
 }

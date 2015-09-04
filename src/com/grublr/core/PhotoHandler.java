@@ -8,6 +8,7 @@ import java.io.IOException;
 public interface PhotoHandler extends DataHandler {
 
     void writePhoto(String name, byte[] image) throws IOException;
+
     byte[] readPhoto(String name) throws IOException;
 
 }

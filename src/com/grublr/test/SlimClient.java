@@ -22,12 +22,12 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 public class SlimClient {
 
     public static void main(String[] args) {
-        findFood();
-        //shareFood();
+        //findFood();
+        shareFood();
     }
 
     private static void shareFood() {
-        String TARGET_URL = "https://grublr-0831.appspot.com/r/food/share";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
         String share = fileToString("/home/adi/Projects/Grublr/share.json");
 
         Client client = ClientBuilder.newBuilder()
@@ -36,9 +36,7 @@ public class SlimClient {
         MultiPart multiPart = new MultiPart();
         multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
 
-        FileDataBodyPart fileDataBodyPart = new FileDataBodyPart("file",
-                new File("/home/adi/Downloads/Aisha/Cover.png"),
-                MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        FileDataBodyPart fileDataBodyPart = new FileDataBodyPart("file", new File("/home/adi/Downloads/Aisha/Cover.png"), MediaType.APPLICATION_OCTET_STREAM_TYPE);
         FormDataBodyPart formDataBodyPart = new FormDataBodyPart("metadata", share, MediaType.TEXT_PLAIN_TYPE);
         multiPart.bodyPart(fileDataBodyPart);
         multiPart.bodyPart(formDataBodyPart);
@@ -50,7 +48,7 @@ public class SlimClient {
     }
 
     private static void findFood() {
-        //String TARGET_URL = "https://grublr-0831.appspot.com/r/food/find";
+        //String TARGET_URL = "https://grublr.elasticbeanstalk.com/r/food/find";
         String TARGET_URL = "http://localhost:8080/r/food/find";
         String find = fileToString("/home/adi/Projects/Grublr/find.json");
 
