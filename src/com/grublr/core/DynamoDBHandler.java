@@ -98,7 +98,7 @@ public class DynamoDBHandler implements DataStoreHandler {
     }
 
     private List<JsonNode> getPostsInRadius(JsonNode node) throws IOException, JSONException {
-        GeoPoint centerPoint = new GeoPoint(node.get(Constants.LATITUDE).doubleValue(), node.get(Constants.LOCATION).doubleValue());
+        GeoPoint centerPoint = new GeoPoint(node.get(Constants.LATITUDE).doubleValue(), node.get(Constants.LONGITUDE).doubleValue());
         double radiusInMeter = node.get(Constants.SEARCH_RADIUS_IN_METERS).doubleValue();
 
         List<String> attributesToGet = new ArrayList<>();
