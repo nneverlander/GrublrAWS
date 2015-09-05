@@ -42,6 +42,7 @@ public class DynamoDBHandler implements DataStoreHandler {
 
     static {
         config.withRangeKeyAttributeName(Constants.UNIQUE_NAME);
+        config.withGeohashIndexName(Constants.GEOHASH_INDEX_NAME);
     }
 
     public static final DynamoDBHandler getInstance() {
@@ -89,7 +90,6 @@ public class DynamoDBHandler implements DataStoreHandler {
             AttributeValue attributeValue = new AttributeValue().withS(entry.getValue().asText());
             putPointRequest.getPutItemRequest().addItemEntry(entry.getKey(), attributeValue);
         }
-        //putPointRequest.getPutItemRequest().addItemEntry(Constants.UNIQUE_NAME, new AttributeValue().withS(associatedImageName));
         geoDataManager.putPoint(putPointRequest);
     }
 
@@ -104,7 +104,7 @@ public class DynamoDBHandler implements DataStoreHandler {
 
         QueryRadiusRequest queryRadiusRequest = new QueryRadiusRequest(centerPoint, radiusInMeter);
         queryRadiusRequest.getQueryRequest().setAttributesToGet(attributesToGet);
-        queryRadiusRequest.getQueryRequest().withConsistentRead(false);
+        //queryRadiusRequest.getQueryRequest().withConsistentRead(false);
         QueryRadiusResult result = geoDataManager.queryRadius(queryRadiusRequest);
         return resultToNodes(result);
     }
