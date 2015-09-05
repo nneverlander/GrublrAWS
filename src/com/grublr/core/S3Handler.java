@@ -4,6 +4,7 @@ import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.google.common.io.ByteStreams;
@@ -41,10 +42,12 @@ public class S3Handler implements PhotoHandler {
         try {
             if (log.isLoggable(Level.INFO)) log.info("Writing photo to S3");
             // TransferManager processes all transfers asynchronously, so this call will return immediately.
-            transferMgr.upload(Constants.S3_BUCKET, name, new ByteArrayInputStream(image), null);
+            long contentLength = image.length;
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(contentLength);
+            transferMgr.upload(Constants.S3_BUCKET, name, new ByteArrayInputStream(image), metadata);
             if (log.isLoggable(Level.INFO)) log.info("Writing photo to S3 complete");
         } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
             throw e;
         }
     }

@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -37,23 +36,10 @@ public class Utils {
         InputStream input = null;
         try {
             input = Utils.class.getResourceAsStream("/" + fileName);
-
-            //log.severe(Utils.class.getResource(fileName).toString());
-            log.severe(Utils.class.getResource("/" + fileName).toString());
-            log.severe(Utils.class.getClassLoader().getResource(fileName).toString());
-
-            //log.info(Utils.class.getResource(fileName).toString());
-            log.info(Utils.class.getResource("/" + fileName).toString());
-            log.info(Utils.class.getClassLoader().getResource(fileName).toString());
-
-            System.out.println(Utils.class.getClassLoader().getResource("/" + fileName));
-            log.severe(Utils.class.getClassLoader().getResource("/" + fileName).toString());
-
-            // load a properties file
             props.load(input);
 
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
         } finally {
             if (input != null) {
                 try {
