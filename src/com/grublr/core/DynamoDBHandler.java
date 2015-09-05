@@ -35,6 +35,14 @@ public class DynamoDBHandler implements DataStoreHandler {
     }
 
     private static DynamoDBHandler instance;
+    private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
+    private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
+    private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_TABLENAME);
+    private static final GeoDataManager geoDataManager = new GeoDataManager(config);
+
+    static {
+        config.withRangeKeyAttributeName(Constants.UNIQUE_NAME);
+    }
 
     public static final DynamoDBHandler getInstance() {
         if (instance == null) {
@@ -42,11 +50,6 @@ public class DynamoDBHandler implements DataStoreHandler {
         }
         return instance;
     }
-
-    private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
-    private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
-    private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_TABLENAME);
-    private static final GeoDataManager geoDataManager = new GeoDataManager(config);
 
     @Override
     public void writeData(String associatedImageName, JsonNode jsonData) throws IOException, JSONException {
@@ -86,9 +89,7 @@ public class DynamoDBHandler implements DataStoreHandler {
             AttributeValue attributeValue = new AttributeValue().withS(entry.getValue().asText());
             putPointRequest.getPutItemRequest().addItemEntry(entry.getKey(), attributeValue);
         }
-        String url = Constants.S3_URL + Constants.S3_BUCKET + "/" + associatedImageName;
-        putPointRequest.getPutItemRequest().addItemEntry(Constants.URL, new AttributeValue().withS(url));
-        putPointRequest.getPutItemRequest().addItemEntry(Constants.UNIQUE_NAME, new AttributeValue().withS(associatedImageName));
+        //putPointRequest.getPutItemRequest().addItemEntry(Constants.UNIQUE_NAME, new AttributeValue().withS(associatedImageName));
         geoDataManager.putPoint(putPointRequest);
     }
 
