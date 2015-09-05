@@ -9,21 +9,19 @@ import com.amazonaws.geo.model.PutPointRequest;
 import com.amazonaws.geo.model.QueryRadiusRequest;
 import com.amazonaws.geo.model.QueryRadiusResult;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
 import com.amazonaws.util.json.JSONException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grublr.util.Constants;
 import com.grublr.util.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,11 +45,8 @@ public class DynamoDBHandler implements DataStoreHandler {
 
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
     private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
-    private static final DynamoDB dynamoDB = new DynamoDB(dbClient);
-    private static final Table table = dynamoDB.getTable(Constants.DYNAMO_DB_TABLENAME);
     private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_TABLENAME);
     private static final GeoDataManager geoDataManager = new GeoDataManager(config);
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void writeData(String associatedImageName, JsonNode jsonData) throws IOException, JSONException {
@@ -83,13 +78,13 @@ public class DynamoDBHandler implements DataStoreHandler {
 
     private void putPoint(String associatedImageName, JsonNode node) throws IOException, JSONException {
         GeoPoint geoPoint = new GeoPoint(node.get(Constants.LATITUDE).doubleValue(), node.get(Constants.LONGITUDE).doubleValue());
-        AttributeValue rangeKeyAttributeValue = new AttributeValue().withS(UUID.randomUUID().toString());
+        AttributeValue rangeKeyAttributeValue = new AttributeValue().withS(associatedImageName);
         PutPointRequest putPointRequest = new PutPointRequest(geoPoint, rangeKeyAttributeValue);
         Iterator<Map.Entry<String, JsonNode>> iter = node.fields();
         while (iter.hasNext()) {
             Map.Entry<String, JsonNode> entry = iter.next();
-            AttributeValue schoolNameKeyAttributeValue = new AttributeValue().withS(entry.getValue().asText());
-            putPointRequest.getPutItemRequest().addItemEntry(entry.getKey(), schoolNameKeyAttributeValue);
+            AttributeValue attributeValue = new AttributeValue().withS(entry.getValue().asText());
+            putPointRequest.getPutItemRequest().addItemEntry(entry.getKey(), attributeValue);
         }
         String url = Constants.S3_URL + Constants.S3_BUCKET + "/" + associatedImageName;
         putPointRequest.getPutItemRequest().addItemEntry(Constants.URL, new AttributeValue().withS(url));
@@ -135,6 +130,20 @@ public class DynamoDBHandler implements DataStoreHandler {
         }
         if (log.isLoggable(Level.FINE)) log.fine("Exited method asJsonString");
         return sb.toString();
+    }
+
+    @Override
+    public void deleteData(String uniqueName) throws Exception{
+        if (log.isLoggable(Level.INFO)) log.info("Deleting posts");
+        try {
+            Map<String, AttributeValue> key = new HashMap<>(1);
+            key.put(Constants.UNIQUE_NAME, new AttributeValue(uniqueName));
+            DeleteItemRequest deleteItemRequest = new DeleteItemRequest(Constants.DYNAMO_DB_TABLENAME, key);
+            dbClient.deleteItem(deleteItemRequest);
+            if (log.isLoggable(Level.INFO)) log.info("Deleted posts");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     /*private void queryRectangle(JSONObject requestObject, PrintWriter out) throws IOException, JSONException {

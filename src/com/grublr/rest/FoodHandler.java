@@ -40,11 +40,21 @@ public class FoodHandler {
         if (log.isLoggable(Level.INFO)) log.info("Share food req received");
         try {
             JsonNode entityObj = Utils.stringToJson(metadata);
-            //Store photo in cloud storage
-            String name = Utils.generateUniqueString(entityObj.get(Constants.NAME).asText());
-            DataHandlerFactory.getDefaultPhotoHandler().writePhoto(name, ByteStreams.toByteArray(image));
+            String uniqueName = Utils.generateUniqueString(entityObj.get(Constants.NAME).asText());
             // Store metadata in data store
-            DataHandlerFactory.getDefaultDataStoreHandler().writeData(name, entityObj);
+            DataHandlerFactory.getDefaultDataStoreHandler().writeData(uniqueName, entityObj);
+            try {
+                //Store photo in cloud storage
+                DataHandlerFactory.getDefaultPhotoHandler().writePhoto(uniqueName, ByteStreams.toByteArray(image));
+            } catch (Exception e) {
+                //If something goes wrong, delete the associated metadata
+                try {
+                    DataHandlerFactory.getDefaultDataStoreHandler().deleteData(uniqueName);
+                } catch (Exception ex) {
+                    log.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
             //return url
             return Response.ok().build();
         } catch (Exception e) {
@@ -69,7 +79,7 @@ public class FoodHandler {
             } else {
                 //Getting images
                 for (JsonNode post : posts) {
-                    String fileName = post.get(Constants.NAME).asText();
+                    String fileName = post.get(Constants.UNIQUE_NAME).asText();
                     final byte[] image = DataHandlerFactory.getDefaultPhotoHandler().readPhoto(fileName);
                     StreamingOutput stream = new StreamingOutput() {
                         public void write(OutputStream out) throws IOException {

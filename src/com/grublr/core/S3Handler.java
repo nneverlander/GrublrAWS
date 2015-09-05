@@ -3,6 +3,7 @@ package com.grublr.core;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
@@ -60,6 +61,17 @@ public class S3Handler implements PhotoHandler {
             InputStream stream = s3object.getObjectContent();
             if (log.isLoggable(Level.INFO)) log.info("Read photo from S3");
             return ByteStreams.toByteArray(stream);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public void deleteData(String name) {
+        try {
+            if (log.isLoggable(Level.INFO)) log.info("Deleting photo from S3");
+            s3Client.deleteObject(new DeleteObjectRequest(Constants.S3_BUCKET, name));
+            if (log.isLoggable(Level.INFO)) log.info("Deleted photo from S3");
         } catch (Exception e) {
             throw e;
         }
