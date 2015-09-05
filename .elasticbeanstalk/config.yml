@@ -1,6 +1,6 @@
 branch-defaults:
   master:
-    environment: grublr
+    environment: grublr-test
 global:
   application_name: grublr
   default_ec2_keyname: keyPair
