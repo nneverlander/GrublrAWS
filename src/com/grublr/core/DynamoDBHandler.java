@@ -104,7 +104,6 @@ public class DynamoDBHandler implements DataStoreHandler {
 
         QueryRadiusRequest queryRadiusRequest = new QueryRadiusRequest(centerPoint, radiusInMeter);
         queryRadiusRequest.getQueryRequest().setAttributesToGet(attributesToGet);
-        //queryRadiusRequest.getQueryRequest().withConsistentRead(false);
         QueryRadiusResult result = geoDataManager.queryRadius(queryRadiusRequest);
         return resultToNodes(result);
     }
