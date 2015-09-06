@@ -87,8 +87,12 @@ public class DynamoDBHandler implements DataStoreHandler {
         Iterator<Map.Entry<String, JsonNode>> iter = node.fields();
         while (iter.hasNext()) {
             Map.Entry<String, JsonNode> entry = iter.next();
+            String key = entry.getKey();
+            if(key.equals(Constants.LATITUDE) || key.equals(Constants.LONGITUDE)) {
+                continue;
+            }
             AttributeValue attributeValue = new AttributeValue().withS(entry.getValue().asText());
-            putPointRequest.getPutItemRequest().addItemEntry(entry.getKey(), attributeValue);
+            putPointRequest.getPutItemRequest().addItemEntry(key, attributeValue);
         }
         geoDataManager.putPoint(putPointRequest);
     }

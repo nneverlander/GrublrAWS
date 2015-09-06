@@ -20,7 +20,7 @@ public class Constants {
 
     //AWS constants
     public static final String S3_BUCKET = "elasticbeanstalk-us-east-1-612569359732";
-    public static final String DYNAMO_DB_TABLENAME = "ImageMetadata";
+    public static final String DYNAMO_DB_TABLENAME = "geo-test";
     public static final String GEOHASH_ATTR_NAME = "geohash";
 
     //App constants
