@@ -41,8 +41,8 @@ public class DynamoDBHandler implements DataStoreHandler {
     private static final GeoDataManager geoDataManager = new GeoDataManager(config);
 
     static {
-        config.withRangeKeyAttributeName(Constants.UNIQUE_NAME);
-        config.withHashKeyAttributeName(Constants.GEOHASH_ATTR_NAME);
+        //config.withRangeKeyAttributeName(Constants.UNIQUE_NAME);
+        //config.withHashKeyAttributeName(Constants.GEOHASH_ATTR_NAME);
     }
 
     public static final DynamoDBHandler getInstance() {
