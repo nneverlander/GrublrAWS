@@ -21,7 +21,7 @@ public class Constants {
     //AWS constants
     public static final String S3_BUCKET = "elasticbeanstalk-us-east-1-612569359732";
     public static final String DYNAMO_DB_TABLENAME = "ImageMetadata";
-    public static final String GEOHASH_INDEX_NAME = "geohash";
+    public static final String GEOHASH_UNIQUE_NAME_INDEX_NAME = "geohash_unique_name-index";
     public static final String S3_URL = "https://s3.amazonaws.com/";
 
     //App constants

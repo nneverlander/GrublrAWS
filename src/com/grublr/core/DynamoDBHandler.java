@@ -42,7 +42,7 @@ public class DynamoDBHandler implements DataStoreHandler {
 
     static {
         config.withRangeKeyAttributeName(Constants.UNIQUE_NAME);
-        config.withGeohashIndexName(Constants.GEOHASH_INDEX_NAME);
+        config.withGeohashIndexName(Constants.GEOHASH_UNIQUE_NAME_INDEX_NAME);
     }
 
     public static final DynamoDBHandler getInstance() {
@@ -101,9 +101,6 @@ public class DynamoDBHandler implements DataStoreHandler {
         attributesToGet.add(Constants.NAME);
         attributesToGet.add(Constants.UNIQUE_NAME);
         attributesToGet.add(Constants.DESCRIPTION);
-
-        log.info("INdex name: " + config.getGeohashIndexName());
-        log.info("hash attr name: " + config.getGeohashAttributeName());
 
         QueryRadiusRequest queryRadiusRequest = new QueryRadiusRequest(centerPoint, radiusInMeter);
         queryRadiusRequest.getQueryRequest().setAttributesToGet(attributesToGet);
