@@ -42,7 +42,7 @@ public class DynamoDBHandler implements DataStoreHandler {
 
     static {
         config.withRangeKeyAttributeName(Constants.UNIQUE_NAME);
-        config.withGeohashIndexName(Constants.GEOHASH_UNIQUE_NAME_INDEX_NAME);
+        config.withHashKeyAttributeName(Constants.GEOHASH_ATTR_NAME);
     }
 
     public static final DynamoDBHandler getInstance() {
