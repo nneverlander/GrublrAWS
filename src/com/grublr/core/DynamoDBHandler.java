@@ -102,6 +102,9 @@ public class DynamoDBHandler implements DataStoreHandler {
         attributesToGet.add(Constants.UNIQUE_NAME);
         attributesToGet.add(Constants.DESCRIPTION);
 
+        log.info("INdex name: " + config.getGeohashIndexName());
+        log.info("hash attr name: " + config.getGeohashAttributeName());
+
         QueryRadiusRequest queryRadiusRequest = new QueryRadiusRequest(centerPoint, radiusInMeter);
         queryRadiusRequest.getQueryRequest().setAttributesToGet(attributesToGet);
         //queryRadiusRequest.getQueryRequest().withConsistentRead(false);
