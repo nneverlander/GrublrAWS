@@ -65,7 +65,7 @@ public class FoodHandler {
     @Path("find")
     public Response findFood(String location) {
         if (log.isLoggable(Level.INFO)) log.info("Find food req received");
-        List<JsonResponse> jsonResponses = new ArrayList<>();
+        List<JsonResponse> responseList = new ArrayList<>();
         try {
             JsonNode locationObj = Utils.stringToJson(location);
             List<JsonNode> posts = DataHandlerFactory.getDefaultDataStoreHandler().readData(locationObj);
@@ -78,14 +78,15 @@ public class FoodHandler {
                     String fileName = post.get(Constants.UNIQUE_NAME).asText();
                     final byte[] image = DataHandlerFactory.getDefaultPhotoHandler().readPhoto(fileName);
                     JsonResponse jsonResponse = new JsonResponse(post, image);
-                    jsonResponses.add(jsonResponse);
+                    responseList.add(jsonResponse);
                 }
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        return Response.ok(jsonResponses).build();
+        JsonResponses responses = new JsonResponses(responseList);
+        return Response.ok(responses).build();
     }
 
     @GET
