@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -54,5 +55,13 @@ public class Utils {
 
     public static String generateUniqueString(String str) {
         return str + Calendar.getInstance().getTimeInMillis() + "-" + UUID.randomUUID();
+    }
+
+    public static JsonNode mapToJson(Map<String, Object> resultMap) throws IOException {
+        return stringToJson(mapper.writeValueAsString(resultMap));
+    }
+
+    public static String mapToString(Map<String, Object> resultMap) throws IOException {
+        return mapper.writeValueAsString(resultMap);
     }
 }

@@ -22,7 +22,7 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 public class SlimClient {
 
     public static void main(String[] args) {
-        shareFood();
+        //shareFood();
         findFood();
     }
 
@@ -49,8 +49,8 @@ public class SlimClient {
     }
 
     private static void findFood() {
-        String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/find";
-        //String TARGET_URL = "http://localhost:8080/r/food/find";
+        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/find";
+        String TARGET_URL = "http://localhost:8080/r/food/find";
         String find = fileToString("/home/adi/Projects/GrublrAWS/find.json");
 
         Client client = ClientBuilder.newBuilder().build();

@@ -25,4 +25,5 @@ public class Constants {
     //App constants
     public static final String APP_PROPERTIES = "app.properties";
 
+    public static final String BINARY_DATA = "binaryData";
 }

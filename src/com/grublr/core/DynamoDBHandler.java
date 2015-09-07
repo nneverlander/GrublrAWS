@@ -1,6 +1,7 @@
 package com.grublr.core;
 
-import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.geo.GeoDataManager;
 import com.amazonaws.geo.GeoDataManagerConfiguration;
 import com.amazonaws.geo.model.GeoPoint;
@@ -36,7 +37,11 @@ public class DynamoDBHandler implements DataStoreHandler {
 
     private static DynamoDBHandler instance;
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
-    private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
+
+    static AWSCredentials credentials = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
+    static AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(credentials);
+
+    //private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
     private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_TABLENAME);
     private static final GeoDataManager geoDataManager = new GeoDataManager(config);
 
@@ -99,41 +104,31 @@ public class DynamoDBHandler implements DataStoreHandler {
     private List<JsonNode> getPostsInRadius(JsonNode node) throws IOException, JSONException {
         GeoPoint centerPoint = new GeoPoint(node.get(Constants.LATITUDE).doubleValue(), node.get(Constants.LONGITUDE).doubleValue());
         double radiusInMeter = node.get(Constants.SEARCH_RADIUS_IN_METERS).doubleValue();
-
-        List<String> attributesToGet = new ArrayList<>();
-        attributesToGet.add(Constants.NAME);
-        attributesToGet.add(Constants.UNIQUE_NAME);
-        attributesToGet.add(Constants.DESCRIPTION);
-
         QueryRadiusRequest queryRadiusRequest = new QueryRadiusRequest(centerPoint, radiusInMeter);
-        queryRadiusRequest.getQueryRequest().setAttributesToGet(attributesToGet);
         QueryRadiusResult result = geoDataManager.queryRadius(queryRadiusRequest);
         return resultToNodes(result);
     }
 
     private List<JsonNode> resultToNodes(GeoQueryResult geoQueryResult) throws JsonParseException, IOException {
         List<JsonNode> nodes = new ArrayList<>();
-        for (Map<String, AttributeValue> item : geoQueryResult.getItem()) {
-            JsonNode node = Utils.stringToJson(asJsonString(item));
+        for(Map<String, AttributeValue> item : geoQueryResult.getItem()) {
+            String geoJsonString = item.get(config.getGeoJsonAttributeName()).getS();
+            JsonNode jsonNode = Utils.stringToJson(geoJsonString);
+
+            double latitude = jsonNode.get("coordinates").get(0).doubleValue();
+            double longitude = jsonNode.get("coordinates").get(1).doubleValue();
+
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put(Constants.LATITUDE, Double.toString(latitude));
+            resultMap.put(Constants.LONGITUDE, Double.toString(longitude));
+            resultMap.put(Constants.UNIQUE_NAME, item.get(Constants.UNIQUE_NAME).getS());
+            resultMap.put(Constants.NAME, item.get(Constants.NAME).getS());
+            resultMap.put(Constants.DESCRIPTION, item.get(Constants.DESCRIPTION).getS());
+
+            JsonNode node = Utils.mapToJson(resultMap);
             nodes.add(node);
         }
         return nodes;
-    }
-
-    private static String asJsonString(Map<String, AttributeValue> result) {
-        if (log.isLoggable(Level.FINE)) log.fine("In method asJsonString");
-        StringBuilder sb = new StringBuilder("{");
-        Iterator iter = result.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry entry = (Map.Entry) iter.next();
-            if (iter.hasNext()) {
-                sb.append("\"" + entry.getKey() + "\"").append(":").append(entry.getValue()).append(",");
-            } else {
-                sb.append("\"" + entry.getKey() + "\"").append(":").append(entry.getValue()).append("}");
-            }
-        }
-        if (log.isLoggable(Level.FINE)) log.fine("Exited method asJsonString");
-        return sb.toString();
     }
 
     @Override
@@ -164,51 +159,6 @@ public class DynamoDBHandler implements DataStoreHandler {
         QueryRectangleResult queryRectangleResult = geoDataManager.queryRectangle(queryRectangleRequest);
 
         resultToNodes(queryRectangleResult, out);
-    }
-
-    private void getPoint(JSONObject requestObject, PrintWriter out) throws IOException, JSONException {
-        GeoPoint geoPoint = new GeoPoint(requestObject.getDouble("lat"), requestObject.getDouble("lng"));
-        AttributeValue rangeKeyAttributeValue = new AttributeValue().withS(requestObject.getString("rangeKey"));
-
-        GetPointRequest getPointRequest = new GetPointRequest(geoPoint, rangeKeyAttributeValue);
-        GetPointResult getPointResult = geoDataManager.getPoint(getPointRequest);
-
-        printGetPointRequest(getPointResult, out);
-    }
-
-    private void printGetPointRequest(GetPointResult getPointResult, PrintWriter out) throws JsonParseException,
-            IOException {
-        Map<String, AttributeValue> item = getPointResult.getGetItemResult().getItem();
-        String geoJsonString = item.get(config.getGeoJsonAttributeName()).getS();
-        JsonParser jsonParser = factory.createJsonParser(geoJsonString);
-        JsonNode jsonNode = mapper.readTree(jsonParser);
-
-        double latitude = jsonNode.get("coordinates").get(0).getDoubleValue();
-        double longitude = jsonNode.get("coordinates").get(1).getDoubleValue();
-        String hashKey = item.get(config.getHashKeyAttributeName()).getN();
-        String rangeKey = item.get(config.getRangeKeyAttributeName()).getS();
-        String geohash = item.get(config.getGeohashAttributeName()).getN();
-        String schoolName = item.get("schoolName").getS();
-        String memo = "";
-        if (item.containsKey("memo")) {
-            memo = item.get("memo").getS();
-        }
-
-        Map<String, String> resultMap = new HashMap<String, String>();
-        resultMap.put("latitude", Double.toString(latitude));
-        resultMap.put("longitude", Double.toString(longitude));
-        resultMap.put("hashKey", hashKey);
-        resultMap.put("rangeKey", rangeKey);
-        resultMap.put("geohash", geohash);
-        resultMap.put("schoolName", schoolName);
-        resultMap.put("memo", memo);
-
-        Map<String, Object> jsonMap = new HashMap<String, Object>();
-        jsonMap.put("action", "get-point");
-        jsonMap.put("result", resultMap);
-
-        out.println(mapper.writeValueAsString(jsonMap));
-        out.flush();
     }
 
     private void updatePoint(JSONObject requestObject, PrintWriter out) throws IOException, JSONException {
