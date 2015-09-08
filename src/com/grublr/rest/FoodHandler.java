@@ -7,7 +7,9 @@ import com.grublr.util.Constants;
 import com.grublr.util.Utils;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
@@ -17,6 +19,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 /**
@@ -65,7 +68,7 @@ public class FoodHandler {
     @Path("find")
     public Response findFood(String location) {
         if (log.isLoggable(Level.INFO)) log.info("Find food req received");
-        List<JsonResponse> responseList = new ArrayList<>();
+        List<GrublrResponse> responseList = new ArrayList<>();
         try {
             JsonNode locationObj = Utils.stringToJson(location);
             List<JsonNode> posts = DataHandlerFactory.getDefaultDataStoreHandler().readData(locationObj);
@@ -73,20 +76,28 @@ public class FoodHandler {
                 if (log.isLoggable(Level.INFO)) log.info("No posts to show");
                 return Response.ok("No posts").build();
             } else {
-                //Getting images
+                //Getting images and metadata
                 for (JsonNode post : posts) {
+                    GrublrResponse grublrResponse = new GrublrResponse();
                     String fileName = post.get(Constants.UNIQUE_NAME).asText();
                     final byte[] image = DataHandlerFactory.getDefaultPhotoHandler().readPhoto(fileName);
-                    JsonResponse jsonResponse = new JsonResponse(post, image);
-                    responseList.add(jsonResponse);
+                    grublrResponse.setBinaryData(image);
+
+                    Iterator<Map.Entry<String, JsonNode>> iter = post.fields();
+                    while (iter.hasNext()) {
+                        Map.Entry<String, JsonNode> entry = iter.next();
+                        PropertyUtils.setProperty(grublrResponse, entry.getKey(), entry.getValue().asText());
+                    }
+
+                    responseList.add(grublrResponse);
                 }
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        JsonResponses responses = new JsonResponses(responseList);
-        return Response.ok(responses).build();
+        GrublrResponses grublrResponses = new GrublrResponses(responseList);
+        return Response.ok(grublrResponses).build();
     }
 
     @GET

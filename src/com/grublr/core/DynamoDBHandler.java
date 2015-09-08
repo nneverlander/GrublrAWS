@@ -1,20 +1,19 @@
 package com.grublr.core;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.geo.GeoDataManager;
-import com.amazonaws.geo.GeoDataManagerConfiguration;
-import com.amazonaws.geo.model.GeoPoint;
-import com.amazonaws.geo.model.GeoQueryResult;
-import com.amazonaws.geo.model.PutPointRequest;
-import com.amazonaws.geo.model.QueryRadiusRequest;
-import com.amazonaws.geo.model.QueryRadiusResult;
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
 import com.amazonaws.util.json.JSONException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.grublr.geo.GeoDataManager;
+import com.grublr.geo.GeoDataManagerConfiguration;
+import com.grublr.geo.model.GeoPoint;
+import com.grublr.geo.model.GeoQueryResult;
+import com.grublr.geo.model.PutPointRequest;
+import com.grublr.geo.model.QueryRadiusRequest;
+import com.grublr.geo.model.QueryRadiusResult;
 import com.grublr.util.Constants;
 import com.grublr.util.Utils;
 import java.io.IOException;
@@ -38,10 +37,7 @@ public class DynamoDBHandler implements DataStoreHandler {
     private static DynamoDBHandler instance;
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
 
-    static AWSCredentials credentials = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
-    static AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(credentials);
-
-    //private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
+    private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
     private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_TABLENAME);
     private static final GeoDataManager geoDataManager = new GeoDataManager(config);
 

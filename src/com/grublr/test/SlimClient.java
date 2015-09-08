@@ -21,7 +21,7 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
  */
 public class SlimClient {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         //shareFood();
         findFood();
     }
@@ -48,17 +48,19 @@ public class SlimClient {
                 + response.getStatusInfo() + " " + response);
     }
 
-    private static void findFood() {
+    private static void findFood() throws IOException {
         //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/find";
         String TARGET_URL = "http://localhost:8080/r/food/find";
         String find = fileToString("/home/adi/Projects/GrublrAWS/find.json");
 
         Client client = ClientBuilder.newBuilder().build();
         WebTarget webTarget = client.target(TARGET_URL);
-        Response response = webTarget.request(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(Entity.json(find));
+        Response response = webTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(find));
 
         System.out.println(response.getStatus() + " "
                 + response.getStatusInfo() + " " + response);
+        boolean hasent = response.hasEntity();
+        String output = response.readEntity(String.class);
     }
 
     public static String fileToString(String fileName) {

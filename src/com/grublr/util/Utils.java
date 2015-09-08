@@ -1,5 +1,6 @@
 package com.grublr.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -63,5 +64,9 @@ public class Utils {
 
     public static String mapToString(Map<String, Object> resultMap) throws IOException {
         return mapper.writeValueAsString(resultMap);
+    }
+
+    public static String jsonToString(JsonNode post) throws JsonProcessingException {
+        return mapper.writeValueAsString(post);
     }
 }
