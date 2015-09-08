@@ -50,7 +50,7 @@ public class SlimClient {
 
     private static void findFood() throws IOException {
         //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/find";
-        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/find";
         //String TARGET_URL = "http://localhost:8080/r/food/find";
         String find = fileToString("/home/adi/Projects/GrublrAWS/find.json");
 
