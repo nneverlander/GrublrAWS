@@ -45,8 +45,7 @@ public class SlimClient {
 
         Response response = webTarget.request(MediaType.TEXT_HTML_TYPE).post(Entity.entity(multiPart, multiPart.getMediaType()));
 
-        System.out.println(response.getStatus() + " "
-                + response.getStatusInfo() + " " + response);
+        System.out.println(response.getStatus() + " " + response.getStatusInfo() + " " + response);
     }
 
     private static void findFood() throws IOException {
