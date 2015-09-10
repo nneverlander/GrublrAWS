@@ -68,6 +68,14 @@ public class S3Handler implements PhotoHandler {
     }
 
     @Override
+    public void editPhoto(String uniqueName, byte[] image) throws IOException {
+        // Editing photo is just deleting and posting again with the same name
+        if (log.isLoggable(Level.INFO)) log.info("Editing photo in S3...");
+        deleteData(uniqueName);
+        writePhoto(uniqueName, image);
+    }
+
+    @Override
     public void deleteData(String name) {
         try {
             if (log.isLoggable(Level.INFO)) log.info("Deleting photo from S3");

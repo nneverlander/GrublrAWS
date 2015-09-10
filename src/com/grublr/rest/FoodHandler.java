@@ -33,7 +33,7 @@ public class FoodHandler {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("share")
     public Response shareFood(@FormDataParam(Constants.METADATA) String metadata, @FormDataParam(Constants.FILE) InputStream image) {
         if (log.isLoggable(Level.INFO)) log.info("Share food req received");
@@ -41,7 +41,7 @@ public class FoodHandler {
             JsonNode entityObj = Utils.stringToJson(metadata);
             String uniqueName = Utils.generateUniqueString(entityObj.get(Constants.NAME).asText());
             // Store metadata in data store
-            DataHandlerFactory.getDefaultDataStoreHandler().writeData(uniqueName, entityObj);
+            DataHandlerFactory.getDefaultDataStoreHandler().writeMetaData(uniqueName, entityObj);
             try {
                 //Store photo in cloud storage
                 DataHandlerFactory.getDefaultPhotoHandler().writePhoto(uniqueName, ByteStreams.toByteArray(image));
@@ -54,8 +54,54 @@ public class FoodHandler {
                 }
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
-            //return url
-            return Response.ok().build();
+
+            String retJson = "{ " + Constants.UNIQUE_NAME + ":" + uniqueName + " }";
+            return Response.ok(retJson).build();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("edit")
+    public Response editPost(@FormDataParam(Constants.METADATA) String metadata, @FormDataParam(Constants.FILE) InputStream image) {
+        if (log.isLoggable(Level.INFO)) log.info("Edit post req received");
+        try {
+            JsonNode entityObj = Utils.stringToJson(metadata);
+            String uniqueName = entityObj.get(Constants.UNIQUE_NAME).asText();
+            // Edit metadata in data store
+            DataHandlerFactory.getDefaultDataStoreHandler().editMetaData(entityObj);
+            if (image != null) {
+                DataHandlerFactory.getDefaultPhotoHandler().editPhoto(uniqueName, ByteStreams.toByteArray(image));
+            }
+
+            String retJson = "{ " + Constants.UNIQUE_NAME + ":" + uniqueName + " }";
+            return Response.ok(retJson).build();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("delete")
+    public Response deletePost(String jsonStr) {
+        if (log.isLoggable(Level.INFO)) log.info("Delete post req received");
+        try {
+            JsonNode entityObj = Utils.stringToJson(jsonStr);
+            String uniqueName = entityObj.get(Constants.UNIQUE_NAME).asText();
+            // Delete metadata from data store
+            DataHandlerFactory.getDefaultDataStoreHandler().deleteData(uniqueName);
+            // Delete photo from cloud storage
+            DataHandlerFactory.getDefaultPhotoHandler().deleteData(uniqueName);
+
+            String retJson = "{ " + Constants.UNIQUE_NAME + ":" + uniqueName + " }";
+            return Response.ok(retJson).build();
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -71,7 +117,7 @@ public class FoodHandler {
         List<GrublrResponse> responseList = new ArrayList<>();
         try {
             JsonNode locationObj = Utils.stringToJson(location);
-            List<JsonNode> posts = DataHandlerFactory.getDefaultDataStoreHandler().readData(locationObj);
+            List<JsonNode> posts = DataHandlerFactory.getDefaultDataStoreHandler().readMetaData(locationObj);
             if (posts == null || posts.isEmpty()) {
                 if (log.isLoggable(Level.INFO)) log.info("No posts to show");
                 return Response.ok("No posts").build();

@@ -10,8 +10,9 @@ import java.util.List;
  */
 public interface DataStoreHandler extends DataHandler {
 
-    void writeData(String associatedImageName, JsonNode jsonData) throws IOException, JSONException;
+    void writeMetaData(String associatedImageName, JsonNode jsonData) throws IOException, JSONException;
 
-    List<JsonNode> readData(JsonNode inputJson) throws IOException, JSONException;
+    List<JsonNode> readMetaData(JsonNode inputJson) throws IOException, JSONException;
 
+    void editMetaData(JsonNode entityObj) throws Exception;
 }

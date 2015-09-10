@@ -53,7 +53,7 @@ public class DynamoDBHandler implements DataStoreHandler {
     }
 
     @Override
-    public void writeData(String associatedImageName, JsonNode jsonData) throws IOException, JSONException {
+    public void writeMetaData(String associatedImageName, JsonNode jsonData) throws IOException, JSONException {
         long begin = System.currentTimeMillis();
         if (log.isLoggable(Level.INFO)) log.info("Storing metadata");
         try {
@@ -66,7 +66,7 @@ public class DynamoDBHandler implements DataStoreHandler {
     }
 
     @Override
-    public List<JsonNode> readData(JsonNode location) throws IOException, JSONException {
+    public List<JsonNode> readMetaData(JsonNode location) throws IOException, JSONException {
         long begin = System.currentTimeMillis();
         if (log.isLoggable(Level.INFO)) log.info("Getting posts");
         try {
@@ -75,6 +75,18 @@ public class DynamoDBHandler implements DataStoreHandler {
             if (log.isLoggable(Level.INFO))
                 log.info("Got metadata and time taken: " + (System.currentTimeMillis() - begin));
             return posts;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public void editMetaData(JsonNode entityObj) throws Exception {
+        if (log.isLoggable(Level.INFO)) log.info("Editing metadata");
+        String uniqueName = entityObj.get(Constants.UNIQUE_NAME).asText();
+        try {
+            putPoint(uniqueName, entityObj);
+            if (log.isLoggable(Level.INFO)) log.info("Edited metadata");
         } catch (Exception e) {
             throw e;
         }
@@ -128,14 +140,14 @@ public class DynamoDBHandler implements DataStoreHandler {
     }
 
     @Override
-    public void deleteData(String uniqueName) throws Exception{
-        if (log.isLoggable(Level.INFO)) log.info("Deleting posts");
+    public void deleteData(String uniqueName) throws Exception {
+        if (log.isLoggable(Level.INFO)) log.info("Deleting post");
         try {
             Map<String, AttributeValue> key = new HashMap<>(1);
             key.put(Constants.UNIQUE_NAME, new AttributeValue(uniqueName));
             DeleteItemRequest deleteItemRequest = new DeleteItemRequest(Constants.DYNAMO_DB_TABLENAME, key);
             dbClient.deleteItem(deleteItemRequest);
-            if (log.isLoggable(Level.INFO)) log.info("Deleted posts");
+            if (log.isLoggable(Level.INFO)) log.info("Deleted post");
         } catch (Exception e) {
             throw e;
         }
@@ -155,69 +167,6 @@ public class DynamoDBHandler implements DataStoreHandler {
         QueryRectangleResult queryRectangleResult = geoDataManager.queryRectangle(queryRectangleRequest);
 
         resultToNodes(queryRectangleResult, out);
-    }
+    } */
 
-    private void updatePoint(JSONObject requestObject, PrintWriter out) throws IOException, JSONException {
-        GeoPoint geoPoint = new GeoPoint(requestObject.getDouble("lat"), requestObject.getDouble("lng"));
-        AttributeValue rangeKeyAttributeValue = new AttributeValue().withS(requestObject.getString("rangeKey"));
-
-        String schoolName = requestObject.getString("schoolName");
-        AttributeValueUpdate schoolNameValueUpdate = null;
-
-        String memo = requestObject.getString("memo");
-        AttributeValueUpdate memoValueUpdate = null;
-
-        if (schoolName == null || schoolName.equalsIgnoreCase("")) {
-            schoolNameValueUpdate = new AttributeValueUpdate().withAction(AttributeAction.DELETE);
-        } else {
-            AttributeValue schoolNameAttributeValue = new AttributeValue().withS(schoolName);
-            schoolNameValueUpdate = new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
-                    schoolNameAttributeValue);
-        }
-
-        if (memo == null || memo.equalsIgnoreCase("")) {
-            memoValueUpdate = new AttributeValueUpdate().withAction(AttributeAction.DELETE);
-        } else {
-            AttributeValue memoAttributeValue = new AttributeValue().withS(memo);
-            memoValueUpdate = new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(memoAttributeValue);
-        }
-
-        UpdatePointRequest updatePointRequest = new UpdatePointRequest(geoPoint, rangeKeyAttributeValue);
-        updatePointRequest.getUpdateItemRequest().addAttributeUpdatesEntry("schoolName", schoolNameValueUpdate);
-        updatePointRequest.getUpdateItemRequest().addAttributeUpdatesEntry("memo", memoValueUpdate);
-
-        UpdatePointResult updatePointResult = geoDataManager.updatePoint(updatePointRequest);
-
-        printUpdatePointResult(updatePointResult, out);
-    }
-
-    private void printUpdatePointResult(UpdatePointResult updatePointResult, PrintWriter out)
-            throws JsonParseException, IOException {
-
-        Map<String, String> jsonMap = new HashMap<String, String>();
-        jsonMap.put("action", "update-point");
-
-        out.println(mapper.writeValueAsString(jsonMap));
-        out.flush();
-    }
-
-    private void deletePoint(JSONObject requestObject, PrintWriter out) throws IOException, JSONException {
-        GeoPoint geoPoint = new GeoPoint(requestObject.getDouble("lat"), requestObject.getDouble("lng"));
-        AttributeValue rangeKeyAttributeValue = new AttributeValue().withS(requestObject.getString("rangeKey"));
-
-        DeletePointRequest deletePointRequest = new DeletePointRequest(geoPoint, rangeKeyAttributeValue);
-        DeletePointResult deletePointResult = geoDataManager.deletePoint(deletePointRequest);
-
-        printDeletePointResult(deletePointResult, out);
-    }
-
-    private void printDeletePointResult(DeletePointResult deletePointResult, PrintWriter out)
-            throws JsonParseException, IOException {
-
-        Map<String, String> jsonMap = new HashMap<String, String>();
-        jsonMap.put("action", "delete-point");
-
-        out.println(mapper.writeValueAsString(jsonMap));
-        out.flush();
-    }*/
 }

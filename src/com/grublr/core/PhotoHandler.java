@@ -11,4 +11,5 @@ public interface PhotoHandler extends DataHandler {
 
     byte[] readPhoto(String name) throws IOException;
 
+    void editPhoto(String uniqueName, byte[] bytes) throws IOException;
 }
