@@ -17,12 +17,22 @@ public class Constants {
     public static final String FILE = "file";
     public static final String SEARCH_RADIUS_IN_METERS = "radius";
 
+    //Users table constants
+    public static final String USERNAME_COL = "userName";
+    public static final String PASSWORD_COL = "password";
+    public static final String SALT_COL = "salt";
+
 
     //AWS constants
     public static final String S3_BUCKET = "elasticbeanstalk-us-east-1-612569359732";
-    public static final String DYNAMO_DB_TABLENAME = "ImageMetadata";
+    public static final String DYNAMO_DB_IMAGE_METADATA_TABLE = "ImageMetadata";
+    public static final String DYNAMO_DB_IMAGE_USERS_TABLE = "Users";
 
     //App constants
     public static final String APP_PROPERTIES = "app.properties";
+
+    //Other constants
+    public static final String ALGORITHM = "PBKDF2WithHmacSHA1";
+    public static final java.lang.Object USERNAME_EXISTS = "userNameExists";
 
 }

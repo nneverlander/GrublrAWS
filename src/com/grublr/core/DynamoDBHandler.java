@@ -3,7 +3,12 @@ package com.grublr.core;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryResult;
 import com.amazonaws.util.json.JSONException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,7 +43,7 @@ public class DynamoDBHandler implements DataStoreHandler {
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
 
     private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
-    private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_TABLENAME);
+    private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_IMAGE_METADATA_TABLE);
     private static final GeoDataManager geoDataManager = new GeoDataManager(config);
 
     static {
@@ -50,6 +55,20 @@ public class DynamoDBHandler implements DataStoreHandler {
             instance = new DynamoDBHandler();
         }
         return instance;
+    }
+
+    public boolean addUser(String userName, String password, String salt) throws Exception {
+        try {
+            Map<String, AttributeValue> m = new HashMap<>();
+            m.put(Constants.USERNAME_COL, new AttributeValue(userName));
+            m.put(Constants.PASSWORD_COL, new AttributeValue(password));
+            m.put(Constants.SALT_COL, new AttributeValue(salt));
+            PutItemRequest putItemRequest = new PutItemRequest(Constants.DYNAMO_DB_IMAGE_USERS_TABLE, m);
+            dbClient.putItem(putItemRequest);
+            return true;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
@@ -145,12 +164,52 @@ public class DynamoDBHandler implements DataStoreHandler {
         try {
             Map<String, AttributeValue> key = new HashMap<>(1);
             key.put(Constants.UNIQUE_NAME, new AttributeValue(uniqueName));
-            DeleteItemRequest deleteItemRequest = new DeleteItemRequest(Constants.DYNAMO_DB_TABLENAME, key);
+            DeleteItemRequest deleteItemRequest = new DeleteItemRequest(Constants.DYNAMO_DB_IMAGE_METADATA_TABLE, key);
             dbClient.deleteItem(deleteItemRequest);
             if (log.isLoggable(Level.INFO)) log.info("Deleted post");
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public boolean checkUserNameExists(String userName) {
+        try {
+            Map<String, Condition> queryFilter = new HashMap<>(1);
+            Condition condition = new Condition()
+                    .withComparisonOperator(ComparisonOperator.EQ)
+                    .withAttributeValueList(new AttributeValue(userName));
+            queryFilter.put(Constants.USERNAME_COL, condition);
+            QueryRequest query = new QueryRequest(Constants.DYNAMO_DB_IMAGE_USERS_TABLE).withQueryFilter(queryFilter);
+            QueryResult result = dbClient.query(query);
+            if (result.getCount() > 0) {
+                return true;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return false;
+    }
+
+    public boolean getUser(String userName) {
+        try {
+            Map<String, Condition> queryFilter = new HashMap<>(1);
+            Condition condition = new Condition()
+                    .withComparisonOperator(ComparisonOperator.EQ)
+                    .withAttributeValueList(new AttributeValue(userName));
+            queryFilter.put(Constants.USERNAME_COL, condition);
+            QueryRequest query = new QueryRequest(Constants.DYNAMO_DB_IMAGE_USERS_TABLE).withQueryFilter(queryFilter);
+            QueryResult result = dbClient.query(query);
+            Map<String, String> retMap = new HashMap<>();
+            if (result.getCount() > 0) {
+                List<Map<String, AttributeValue>> list = result.getItems();
+                for (Map<String, AttributeValue> m : list) {
+                    retMap.put(m.en)
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return false;
     }
 
     /*private void queryRectangle(JSONObject requestObject, PrintWriter out) throws IOException, JSONException {
