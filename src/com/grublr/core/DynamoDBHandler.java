@@ -81,7 +81,7 @@ public class DynamoDBHandler implements DataStoreHandler {
         try {
             putPoint(associatedImageName, jsonData);
             if (log.isLoggable(Level.INFO))
-                log.info("Stored metadata and time taken: " + (System.currentTimeMillis() - begin));
+                log.info("Stored metadata and time taken : " + (System.currentTimeMillis() - begin));
         } catch (Exception e) {
             throw e;
         }
