@@ -34,5 +34,6 @@ public class Constants {
     //Other constants
     public static final String ALGORITHM = "PBKDF2WithHmacSHA1";
     public static final java.lang.Object USERNAME_EXISTS = "userNameExists";
+    public static final String AUTH_FAILURE = "authFailure";
 
 }

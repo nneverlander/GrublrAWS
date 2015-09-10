@@ -42,6 +42,9 @@ public class DynamoDBHandler implements DataStoreHandler {
     private static DynamoDBHandler instance;
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
 
+    //static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
+    //private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(creds);
+
     private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
     private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_IMAGE_METADATA_TABLE);
     private static final GeoDataManager geoDataManager = new GeoDataManager(config);
@@ -174,14 +177,14 @@ public class DynamoDBHandler implements DataStoreHandler {
 
     public boolean checkUserNameExists(String userName) {
         try {
-            Map<String, Condition> queryFilter = new HashMap<>(1);
             Condition condition = new Condition()
                     .withComparisonOperator(ComparisonOperator.EQ)
                     .withAttributeValueList(new AttributeValue(userName));
-            queryFilter.put(Constants.USERNAME_COL, condition);
-            QueryRequest query = new QueryRequest(Constants.DYNAMO_DB_IMAGE_USERS_TABLE).withQueryFilter(queryFilter);
+            QueryRequest query = new QueryRequest(Constants.DYNAMO_DB_IMAGE_USERS_TABLE);
+            query.addKeyConditionsEntry(Constants.USERNAME_COL, condition);
             QueryResult result = dbClient.query(query);
             if (result.getCount() > 0) {
+                if (log.isLoggable(Level.WARNING)) log.warning("Username already exists");
                 return true;
             }
         } catch (Exception e) {
@@ -190,26 +193,29 @@ public class DynamoDBHandler implements DataStoreHandler {
         return false;
     }
 
-    public boolean getUser(String userName) {
+    public Map<String, String> getUser(String userName) {
         try {
-            Map<String, Condition> queryFilter = new HashMap<>(1);
             Condition condition = new Condition()
                     .withComparisonOperator(ComparisonOperator.EQ)
                     .withAttributeValueList(new AttributeValue(userName));
-            queryFilter.put(Constants.USERNAME_COL, condition);
-            QueryRequest query = new QueryRequest(Constants.DYNAMO_DB_IMAGE_USERS_TABLE).withQueryFilter(queryFilter);
+            QueryRequest query = new QueryRequest(Constants.DYNAMO_DB_IMAGE_USERS_TABLE);
+            query.addKeyConditionsEntry(Constants.USERNAME_COL, condition);
             QueryResult result = dbClient.query(query);
-            Map<String, String> retMap = new HashMap<>();
+            Map<String, String> retMap = new HashMap<>(3);
             if (result.getCount() > 0) {
                 List<Map<String, AttributeValue>> list = result.getItems();
-                for (Map<String, AttributeValue> m : list) {
-                    retMap.put(m.en)
+                if (list.size() > 1) {
+                    log.log(Level.SEVERE, "Multiple entries found with same username : " + userName);
+                }
+                Map<String, AttributeValue> m  = list.get(0);
+                for (Map.Entry<String, AttributeValue> e : m.entrySet()) {
+                    retMap.put(e.getKey(), e.getValue().getS());
                 }
             }
+            return retMap;
         } catch (Exception e) {
             throw e;
         }
-        return false;
     }
 
     /*private void queryRectangle(JSONObject requestObject, PrintWriter out) throws IOException, JSONException {

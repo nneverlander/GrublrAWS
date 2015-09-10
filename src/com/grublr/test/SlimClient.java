@@ -22,8 +22,38 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 public class SlimClient {
 
     public static void main(String[] args) throws IOException {
-        shareFood();
-        findFood();
+        //shareFood();
+        //findFood();
+        //signUp();
+        signIn();
+    }
+
+    private static void signIn() {
+        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
+        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        String TARGET_URL = "http://localhost:8080/r/signin";
+        String signIn = fileToString("/home/adi/Projects/GrublrAWS/signin.json");
+
+        Client client = ClientBuilder.newBuilder().build();
+        WebTarget webTarget = client.target(TARGET_URL);
+        Response response = webTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(signIn));
+
+        System.out.println(response.getStatus() + " "
+                + response.getStatusInfo() + " " + response);
+    }
+
+    private static void signUp() {
+        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
+        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        String TARGET_URL = "http://localhost:8080/r/signup";
+        String signIn = fileToString("/home/adi/Projects/GrublrAWS/signup.json");
+
+        Client client = ClientBuilder.newBuilder().build();
+        WebTarget webTarget = client.target(TARGET_URL);
+        Response response = webTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(signIn));
+
+        System.out.println(response.getStatus() + " "
+                + response.getStatusInfo() + " " + response);
     }
 
     private static void shareFood() {
