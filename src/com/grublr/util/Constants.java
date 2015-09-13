@@ -24,7 +24,8 @@ public class Constants {
 
 
     //AWS constants
-    public static final String S3_BUCKET = "elasticbeanstalk-us-east-1-612569359732";
+    public static final String S3_BUCKET = "grublr-images";
+    public static final String S3_URL = "https://s3.amazonaws.com/";
     public static final String DYNAMO_DB_IMAGE_METADATA_TABLE = "ImageMetadata";
     public static final String DYNAMO_DB_IMAGE_USERS_TABLE = "Users";
 

@@ -126,8 +126,8 @@ public class FoodHandler {
                 for (JsonNode post : posts) {
                     GrublrResponse grublrResponse = new GrublrResponse();
                     String fileName = post.get(Constants.UNIQUE_NAME).asText();
-                    final byte[] image = DataHandlerFactory.getDefaultPhotoHandler().readPhoto(fileName);
-                    grublrResponse.setBinaryData(image);
+                    final String imageUrl = DataHandlerFactory.getDefaultPhotoHandler().readPhoto(fileName);
+                    grublrResponse.setImageUrl(imageUrl);
 
                     Iterator<Map.Entry<String, JsonNode>> iter = post.fields();
                     while (iter.hasNext()) {

@@ -9,7 +9,7 @@ public interface PhotoHandler extends DataHandler {
 
     void writePhoto(String name, byte[] image) throws IOException;
 
-    byte[] readPhoto(String name) throws IOException;
+    String readPhoto(String name) throws IOException;
 
     void editPhoto(String uniqueName, byte[] bytes) throws IOException;
 }

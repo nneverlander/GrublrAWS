@@ -8,12 +8,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class GrublrResponse {
 
-    private byte[] binaryData;
     private String unique_name;
     private String name;
     private String desc;
     private String lat;
     private String lon;
+    private String imageUrl;
 
     public GrublrResponse() {
 
@@ -59,13 +59,12 @@ public class GrublrResponse {
         this.lon = lon;
     }
 
-    public byte[] getBinaryData() {
-        return binaryData;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setBinaryData(byte[] binaryData) {
-        this.binaryData = binaryData;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
-
 
 }
