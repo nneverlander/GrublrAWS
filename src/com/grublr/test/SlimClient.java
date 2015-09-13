@@ -22,10 +22,10 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 public class SlimClient {
 
     public static void main(String[] args) throws IOException {
-        //shareFood();
+        shareFood();
         //findFood();
         //signUp();
-        signIn();
+        //signIn();
     }
 
     private static void signIn() {
@@ -73,7 +73,7 @@ public class SlimClient {
         multiPart.bodyPart(fileDataBodyPart);
         multiPart.bodyPart(formDataBodyPart);
 
-        Response response = webTarget.request(MediaType.TEXT_HTML_TYPE).post(Entity.entity(multiPart, multiPart.getMediaType()));
+        Response response = webTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.entity(multiPart, multiPart.getMediaType()));
 
         System.out.println(response.getStatus() + " " + response.getStatusInfo() + " " + response);
     }
