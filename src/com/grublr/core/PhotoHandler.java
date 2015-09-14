@@ -1,5 +1,6 @@
 package com.grublr.core;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 
 /**
@@ -11,5 +12,5 @@ public interface PhotoHandler extends DataHandler {
 
     String readPhoto(String name) throws IOException;
 
-    void editPhoto(String uniqueName, byte[] bytes) throws IOException;
+    void editPhoto(JsonNode node, byte[] bytes) throws IOException;
 }

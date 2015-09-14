@@ -1,11 +1,12 @@
 package com.grublr.core;
 
-import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.model.AttributeAction;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.AttributeValueUpdate;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
-import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryResult;
@@ -14,11 +15,13 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.grublr.geo.GeoDataManager;
 import com.grublr.geo.GeoDataManagerConfiguration;
+import com.grublr.geo.model.DeletePointRequest;
 import com.grublr.geo.model.GeoPoint;
 import com.grublr.geo.model.GeoQueryResult;
 import com.grublr.geo.model.PutPointRequest;
 import com.grublr.geo.model.QueryRadiusRequest;
 import com.grublr.geo.model.QueryRadiusResult;
+import com.grublr.geo.model.UpdatePointRequest;
 import com.grublr.util.Constants;
 import com.grublr.util.Utils;
 import java.io.IOException;
@@ -42,10 +45,10 @@ public class DynamoDBHandler implements DataStoreHandler {
     private static DynamoDBHandler instance;
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
 
-    //static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
-    //private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(creds);
+    static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
+    private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(creds);
 
-    private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
+    //private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
     private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_IMAGE_METADATA_TABLE);
     private static final GeoDataManager geoDataManager = new GeoDataManager(config);
 
@@ -105,9 +108,8 @@ public class DynamoDBHandler implements DataStoreHandler {
     @Override
     public void editMetaData(JsonNode entityObj) throws Exception {
         if (log.isLoggable(Level.INFO)) log.info("Editing metadata");
-        String uniqueName = entityObj.get(Constants.UNIQUE_NAME).asText();
         try {
-            putPoint(uniqueName, entityObj);
+            updatePoint(entityObj);
             if (log.isLoggable(Level.INFO)) log.info("Edited metadata");
         } catch (Exception e) {
             throw e;
@@ -161,14 +163,38 @@ public class DynamoDBHandler implements DataStoreHandler {
         return nodes;
     }
 
+    private void updatePoint(JsonNode node) throws IOException, JSONException {
+        GeoPoint geoPoint = new GeoPoint(node.get(Constants.LATITUDE).doubleValue(), node.get(Constants.LONGITUDE).doubleValue());
+        AttributeValue rangeKeyAttributeValue = new AttributeValue().withS(node.get(Constants.UNIQUE_NAME).asText());
+        UpdatePointRequest updatePointRequest = new UpdatePointRequest(geoPoint, rangeKeyAttributeValue);
+        Iterator<Map.Entry<String, JsonNode>> iter = node.fields();
+        while (iter.hasNext()) {
+            Map.Entry<String, JsonNode> entry = iter.next();
+            String key = entry.getKey();
+            if(key.equals(Constants.UNIQUE_NAME) || key.equals(Constants.LATITUDE) || key.equals(Constants.LONGITUDE)) {
+                continue;
+            }
+            AttributeValue attributeValue = new AttributeValue().withS(entry.getValue().asText());
+            AttributeValueUpdate attributeValueUpdate = new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(attributeValue);
+            updatePointRequest.getUpdateItemRequest().addAttributeUpdatesEntry(key, attributeValueUpdate);
+        }
+        geoDataManager.updatePoint(updatePointRequest);
+    }
+
+    private void deletePoint(JsonNode node) throws IOException, JSONException {
+        GeoPoint geoPoint = new GeoPoint(node.get(Constants.LATITUDE).doubleValue(), node.get(Constants.LONGITUDE).doubleValue());
+        AttributeValue rangeKeyAttributeValue = new AttributeValue().withS(node.get(Constants.UNIQUE_NAME).asText());
+
+        DeletePointRequest deletePointRequest = new DeletePointRequest(geoPoint, rangeKeyAttributeValue);
+        geoDataManager.deletePoint(deletePointRequest);
+
+    }
+
     @Override
-    public void deleteData(String uniqueName) throws Exception {
+    public void deleteData(JsonNode entityObj) throws Exception {
         if (log.isLoggable(Level.INFO)) log.info("Deleting post");
         try {
-            Map<String, AttributeValue> key = new HashMap<>(1);
-            key.put(Constants.UNIQUE_NAME, new AttributeValue(uniqueName));
-            DeleteItemRequest deleteItemRequest = new DeleteItemRequest(Constants.DYNAMO_DB_IMAGE_METADATA_TABLE, key);
-            dbClient.deleteItem(deleteItemRequest);
+            deletePoint(entityObj);
             if (log.isLoggable(Level.INFO)) log.info("Deleted post");
         } catch (Exception e) {
             throw e;

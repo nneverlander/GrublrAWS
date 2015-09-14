@@ -1,11 +1,13 @@
 package com.grublr.core;
 
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.TransferManager;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.grublr.util.Constants;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,10 +34,10 @@ public class S3Handler implements PhotoHandler {
 
     private static final Logger log = Logger.getLogger(S3Handler.class.getName());
 
-    //static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
-    //private static final AmazonS3 s3Client = new AmazonS3Client(creds);
+    static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
+    private static final AmazonS3 s3Client = new AmazonS3Client(creds);
 
-    private static final AmazonS3 s3Client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+    //private static final AmazonS3 s3Client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
     private static final TransferManager transferMgr = new TransferManager(new InstanceProfileCredentialsProvider());
 
     @Override
@@ -67,18 +69,18 @@ public class S3Handler implements PhotoHandler {
     }
 
     @Override
-    public void editPhoto(String uniqueName, byte[] image) throws IOException {
+    public void editPhoto(JsonNode node, byte[] image) throws IOException {
         // Editing photo is just deleting and posting again with the same name
         if (log.isLoggable(Level.INFO)) log.info("Editing photo in S3...");
-        deleteData(uniqueName);
-        writePhoto(uniqueName, image);
+        deleteData(node);
+        writePhoto(node.get(Constants.UNIQUE_NAME).asText(), image);
     }
 
     @Override
-    public void deleteData(String name) {
+    public void deleteData(JsonNode node) {
         try {
             if (log.isLoggable(Level.INFO)) log.info("Deleting photo from S3");
-            s3Client.deleteObject(new DeleteObjectRequest(Constants.S3_BUCKET, name));
+            s3Client.deleteObject(new DeleteObjectRequest(Constants.S3_BUCKET, node.get(Constants.UNIQUE_NAME).asText()));
             if (log.isLoggable(Level.INFO)) log.info("Deleted photo from S3");
         } catch (Exception e) {
             throw e;

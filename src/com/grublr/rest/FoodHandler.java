@@ -48,7 +48,7 @@ public class FoodHandler {
             } catch (Exception e) {
                 //If something goes wrong, delete the associated metadata
                 try {
-                    DataHandlerFactory.getDefaultDataStoreHandler().deleteData(uniqueName);
+                    DataHandlerFactory.getDefaultDataStoreHandler().deleteData(entityObj);
                 } catch (Exception ex) {
                     log.log(Level.SEVERE, ex.getMessage(), ex);
                 }
@@ -75,9 +75,28 @@ public class FoodHandler {
             // Edit metadata in data store
             DataHandlerFactory.getDefaultDataStoreHandler().editMetaData(entityObj);
             if (image != null) {
-                DataHandlerFactory.getDefaultPhotoHandler().editPhoto(uniqueName, ByteStreams.toByteArray(image));
+                DataHandlerFactory.getDefaultPhotoHandler().editPhoto(entityObj, ByteStreams.toByteArray(image));
             }
 
+            String retJson = "{ " + Constants.UNIQUE_NAME + ":" + uniqueName + " }";
+            return Response.ok(retJson).build();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("editMeta")
+    public Response editMeta(String metadata) {
+        if (log.isLoggable(Level.INFO)) log.info("Edit meta req received");
+        try {
+            JsonNode entityObj = Utils.stringToJson(metadata);
+            String uniqueName = entityObj.get(Constants.UNIQUE_NAME).asText();
+            // Edit metadata in data store
+            DataHandlerFactory.getDefaultDataStoreHandler().editMetaData(entityObj);
             String retJson = "{ " + Constants.UNIQUE_NAME + ":" + uniqueName + " }";
             return Response.ok(retJson).build();
         } catch (Exception e) {
@@ -96,9 +115,9 @@ public class FoodHandler {
             JsonNode entityObj = Utils.stringToJson(jsonStr);
             String uniqueName = entityObj.get(Constants.UNIQUE_NAME).asText();
             // Delete metadata from data store
-            DataHandlerFactory.getDefaultDataStoreHandler().deleteData(uniqueName);
+            DataHandlerFactory.getDefaultDataStoreHandler().deleteData(entityObj);
             // Delete photo from cloud storage
-            DataHandlerFactory.getDefaultPhotoHandler().deleteData(uniqueName);
+            DataHandlerFactory.getDefaultPhotoHandler().deleteData(entityObj);
 
             String retJson = "{ " + Constants.UNIQUE_NAME + ":" + uniqueName + " }";
             return Response.ok(retJson).build();

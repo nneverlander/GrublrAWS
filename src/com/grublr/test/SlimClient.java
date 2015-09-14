@@ -22,7 +22,9 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 public class SlimClient {
 
     public static void main(String[] args) throws IOException {
-        shareFood();
+        //shareFood();
+        //editFood();
+        deleteFood();
         //findFood();
         //signUp();
         //signIn();
@@ -58,8 +60,8 @@ public class SlimClient {
 
     private static void shareFood() {
         //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
-        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
-        //String TARGET_URL = "http://localhost:8080/r/food/share";
+        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        String TARGET_URL = "http://localhost:8080/r/food/share";
         String share = fileToString("/home/adi/Projects/GrublrAWS/share.json");
 
         Client client = ClientBuilder.newBuilder()
@@ -83,6 +85,34 @@ public class SlimClient {
         String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/find";
         //String TARGET_URL = "http://localhost:8080/r/food/find";
         String find = fileToString("/home/adi/Projects/GrublrAWS/find.json");
+
+        Client client = ClientBuilder.newBuilder().build();
+        WebTarget webTarget = client.target(TARGET_URL);
+        Response response = webTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(find));
+
+        System.out.println(response.getStatus() + " "
+                + response.getStatusInfo() + " " + response);
+    }
+
+    private static void editFood() throws IOException {
+        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/editMeta";
+        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/editMeta";
+        String TARGET_URL = "http://localhost:8080/r/food/editMeta";
+        String find = fileToString("/home/adi/Projects/GrublrAWS/edit.json");
+
+        Client client = ClientBuilder.newBuilder().build();
+        WebTarget webTarget = client.target(TARGET_URL);
+        Response response = webTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(find));
+
+        System.out.println(response.getStatus() + " "
+                + response.getStatusInfo() + " " + response);
+    }
+
+    private static void deleteFood() throws IOException {
+        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/delete";
+        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/delete";
+        String TARGET_URL = "http://localhost:8080/r/food/delete";
+        String find = fileToString("/home/adi/Projects/GrublrAWS/delete.json");
 
         Client client = ClientBuilder.newBuilder().build();
         WebTarget webTarget = client.target(TARGET_URL);
