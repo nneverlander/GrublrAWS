@@ -1,6 +1,5 @@
 package com.grublr.core;
 
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -34,10 +33,10 @@ public class S3Handler implements PhotoHandler {
 
     private static final Logger log = Logger.getLogger(S3Handler.class.getName());
 
-    static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
-    private static final AmazonS3 s3Client = new AmazonS3Client(creds);
+    //static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
+    //private static final AmazonS3 s3Client = new AmazonS3Client(creds);
 
-    //private static final AmazonS3 s3Client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+    private static final AmazonS3 s3Client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
     private static final TransferManager transferMgr = new TransferManager(new InstanceProfileCredentialsProvider());
 
     @Override
