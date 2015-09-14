@@ -22,9 +22,9 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 public class SlimClient {
 
     public static void main(String[] args) throws IOException {
-        //shareFood();
+        shareFood();
         //editFood();
-        deleteFood();
+        //deleteFood();
         //findFood();
         //signUp();
         //signIn();
@@ -32,8 +32,8 @@ public class SlimClient {
 
     private static void signIn() {
         //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
-        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
-        String TARGET_URL = "http://localhost:8080/r/signin";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        //String TARGET_URL = "http://localhost:8080/r/signin";
         String signIn = fileToString("/home/adi/Projects/GrublrAWS/signin.json");
 
         Client client = ClientBuilder.newBuilder().build();
@@ -46,8 +46,8 @@ public class SlimClient {
 
     private static void signUp() {
         //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
-        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
-        String TARGET_URL = "http://localhost:8080/r/signup";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        //String TARGET_URL = "http://localhost:8080/r/signup";
         String signIn = fileToString("/home/adi/Projects/GrublrAWS/signup.json");
 
         Client client = ClientBuilder.newBuilder().build();
@@ -60,8 +60,8 @@ public class SlimClient {
 
     private static void shareFood() {
         //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
-        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
-        String TARGET_URL = "http://localhost:8080/r/food/share";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        //String TARGET_URL = "http://localhost:8080/r/food/share";
         String share = fileToString("/home/adi/Projects/GrublrAWS/share.json");
 
         Client client = ClientBuilder.newBuilder()
@@ -96,8 +96,8 @@ public class SlimClient {
 
     private static void editFood() throws IOException {
         //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/editMeta";
-        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/editMeta";
-        String TARGET_URL = "http://localhost:8080/r/food/editMeta";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/editMeta";
+        //String TARGET_URL = "http://localhost:8080/r/food/editMeta";
         String find = fileToString("/home/adi/Projects/GrublrAWS/edit.json");
 
         Client client = ClientBuilder.newBuilder().build();
@@ -110,8 +110,8 @@ public class SlimClient {
 
     private static void deleteFood() throws IOException {
         //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/delete";
-        //String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/delete";
-        String TARGET_URL = "http://localhost:8080/r/food/delete";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/delete";
+        //String TARGET_URL = "http://localhost:8080/r/food/delete";
         String find = fileToString("/home/adi/Projects/GrublrAWS/delete.json");
 
         Client client = ClientBuilder.newBuilder().build();
