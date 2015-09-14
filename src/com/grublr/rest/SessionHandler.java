@@ -44,7 +44,7 @@ public class SessionHandler {
             userName = userName.trim();
             boolean userNameExists = checkUserNameExists(userName);
             if (userNameExists) {
-                return Response.ok(Constants.USERNAME_EXISTS).build();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Constants.USERNAME_EXISTS).build();
             }
             // Generate the salt for encrypting password
             byte[] salt = generateSalt();
@@ -96,17 +96,18 @@ public class SessionHandler {
             userName = userName.trim();
             Map<String, String> userDetails = DynamoDBHandler.getInstance().getUser(userName);
             if (userDetails.isEmpty()) {
-                return Response.ok(Constants.AUTH_FAILURE).build();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Constants.AUTH_FAILURE).build();
             }
             // Authenticate password here
             if (log.isLoggable(Level.INFO)) log.info("Comparing passwords");
             boolean isAuthenticated = authenticate(password, fromHex(userDetails.get(Constants.PASSWORD_COL)), fromHex(userDetails.get(Constants.SALT_COL)));
             if (isAuthenticated) {
                 if (log.isLoggable(Level.INFO)) log.info("passwords match");
-                return Response.ok(userName).build();
+                String retJson = "{ " + Constants.USERNAME_COL + " : " + userName + " }";
+                return Response.ok(retJson).build();
             } else {
                 if (log.isLoggable(Level.WARNING)) log.warning("passwords don't match");
-                return Response.ok(Constants.AUTH_FAILURE).build();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Constants.AUTH_FAILURE).build();
             }
         } catch (NoSuchAlgorithmException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -120,8 +121,7 @@ public class SessionHandler {
 
     // Password handling functions
     private byte[] generateSalt() throws NoSuchAlgorithmException {
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-        // Generate a 8 byte (64 bit) salt as recommended by RSA PKCS5
+        SecureRandom random = SecureRandom.getInstance(Constants.SECURE_RANDOM);
         byte[] salt = new byte[8];
         random.nextBytes(salt);
         return salt;

@@ -22,17 +22,17 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 public class SlimClient {
 
     public static void main(String[] args) throws IOException {
-        shareFood();
+        //shareFood();
         //editFood();
         //deleteFood();
         //findFood();
         //signUp();
-        //signIn();
+        signIn();
     }
 
     private static void signIn() {
-        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
-        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/signin";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/signin";
         //String TARGET_URL = "http://localhost:8080/r/signin";
         String signIn = fileToString("/home/adi/Projects/GrublrAWS/signin.json");
 
@@ -45,8 +45,8 @@ public class SlimClient {
     }
 
     private static void signUp() {
-        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/food/share";
-        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/food/share";
+        //String TARGET_URL = "http://grublr-test.elasticbeanstalk.com/r/signup";
+        String TARGET_URL = "http://grublr.elasticbeanstalk.com/r/signup";
         //String TARGET_URL = "http://localhost:8080/r/signup";
         String signIn = fileToString("/home/adi/Projects/GrublrAWS/signup.json");
 
