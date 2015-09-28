@@ -23,6 +23,10 @@ public class Utils {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final Logger log = Logger.getLogger(Utils.class.getName());
 
+    static {
+        System.setProperty("java.util.logging.config.file", "/logging.properties");
+    }
+
     public static JsonNode stringToJson(String str) throws IOException {
         try {
             return mapper.readTree(str);
