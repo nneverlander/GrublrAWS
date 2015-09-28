@@ -25,6 +25,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -215,8 +216,8 @@ public class SessionHandler {
     }
 
     @Path("forgotPassword")
-    @GET
-    public Response forgotPassword(@PathParam("email") String email) {
+    @POST
+    public Response forgotPassword(@FormParam("email") String email) {
         if (log.isLoggable(Level.INFO)) log.info("Forgot password req received");
         try {
             if (!checkUserNameExists(email)) {
