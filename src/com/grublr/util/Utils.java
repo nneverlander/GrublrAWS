@@ -1,8 +1,12 @@
 package com.grublr.util;
 
+import com.amazonaws.util.IOUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.geometry.S2LatLng;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
@@ -54,6 +58,23 @@ public class Utils {
         return props;
     }
 
+    public static double getDistanceBetweenPointsInMiles(double lat1, double lng1, double lat2, double lng2) {
+        S2LatLng point1 = S2LatLng.fromDegrees(lat1, lng1);
+        S2LatLng point2 = S2LatLng.fromDegrees(lat2, lng2);
+        double distInMeters = point1.getEarthDistance(point2);
+        //Convert to miles
+        return distInMeters/Constants.METERS_PER_MILE;
+    }
+
+    public static File stream2file (InputStream in) throws IOException {
+        final File tempFile = File.createTempFile("streamToFile", ".tmp");
+        tempFile.deleteOnExit();
+        try (FileOutputStream out = new FileOutputStream(tempFile)) {
+            IOUtils.copy(in, out);
+        }
+        return tempFile;
+    }
+
     public static String generateUniqueString(String str) {
         return str + Calendar.getInstance().getTimeInMillis() + "-" + UUID.randomUUID();
     }
@@ -68,5 +89,9 @@ public class Utils {
 
     public static String jsonToString(JsonNode post) throws JsonProcessingException {
         return mapper.writeValueAsString(post);
+    }
+
+    public static String objToString(Object object) throws JsonProcessingException {
+        return mapper.writeValueAsString(object);
     }
 }

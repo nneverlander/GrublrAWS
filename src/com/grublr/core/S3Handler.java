@@ -1,14 +1,20 @@
 package com.grublr.core;
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.services.glacier.AmazonGlacierClient;
+import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.grublr.util.Constants;
+import com.grublr.util.Utils;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,8 +42,16 @@ public class S3Handler implements PhotoHandler {
     //static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
     //private static final AmazonS3 s3Client = new AmazonS3Client(creds);
 
-    private static final AmazonS3 s3Client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
-    private static final TransferManager transferMgr = new TransferManager(new InstanceProfileCredentialsProvider());
+    private static final InstanceProfileCredentialsProvider credentials = new InstanceProfileCredentialsProvider();
+
+    private static final AmazonS3 s3Client = new AmazonS3Client(credentials);
+    private static final TransferManager transferMgr = new TransferManager(credentials);
+    private static final AmazonGlacierClient glacierClient = new AmazonGlacierClient(credentials);
+    private static final ArchiveTransferManager atm = new ArchiveTransferManager(glacierClient, credentials);
+
+    static {
+        glacierClient.setEndpoint(Constants.GLACIER_ENDPOINT);
+    }
 
     @Override
     public void writePhoto(String name, byte[] image) throws IOException {
@@ -73,6 +87,23 @@ public class S3Handler implements PhotoHandler {
         if (log.isLoggable(Level.INFO)) log.info("Editing photo in S3...");
         deleteData(node);
         writePhoto(node.get(Constants.UNIQUE_NAME).asText(), image);
+    }
+
+    // This method just deletes photo from S3 and puts it in Glacier
+    @Override
+    public void postTaken(JsonNode entityObj) throws IOException {
+        // First put in Glacier
+        if (log.isLoggable(Level.INFO)) log.info("Putting photo in Glacier");
+        try {
+            S3Object photo = s3Client.getObject(new GetObjectRequest(Constants.S3_BUCKET, entityObj.get(Constants.UNIQUE_NAME).asText()));
+            File f = Utils.stream2file(photo.getObjectContent());
+            atm.upload(Constants.GLACIER_VAULT, entityObj.get(Constants.UNIQUE_NAME).asText(), f);
+            if (log.isLoggable(Level.INFO)) log.info("Finished putting photo in Glacier");
+            // Once succesful, delete from S3
+            deleteData(entityObj);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override

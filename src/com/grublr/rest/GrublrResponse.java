@@ -1,5 +1,9 @@
 package com.grublr.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.grublr.util.Utils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -7,6 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class GrublrResponse {
+
+    private static final Logger log = Logger.getLogger(GrublrResponse.class.getName());
 
     private String unique_name;
     private String name;
@@ -65,6 +71,16 @@ public class GrublrResponse {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return Utils.objToString(this);
+        } catch (JsonProcessingException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return "Exception occurred in toString()";
     }
 
 }

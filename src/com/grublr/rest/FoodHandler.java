@@ -130,6 +130,28 @@ public class FoodHandler {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("taken")
+    public Response postTaken(String jsonStr) {
+        if (log.isLoggable(Level.INFO)) log.info("Taken post req received");
+        try {
+            JsonNode entityObj = Utils.stringToJson(jsonStr);
+            String uniqueName = entityObj.get(Constants.UNIQUE_NAME).asText();
+            // Delete metadata from data store
+            DataHandlerFactory.getDefaultDataStoreHandler().postTaken(entityObj);
+            // Delete photo from cloud storage
+            DataHandlerFactory.getDefaultPhotoHandler().postTaken(entityObj);
+
+            String retJson = "{ " + Constants.UNIQUE_NAME + ":" + uniqueName + " }";
+            return Response.ok(retJson).build();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("find")
     public Response findFood(String location) {
         if (log.isLoggable(Level.INFO)) log.info("Find food req received");

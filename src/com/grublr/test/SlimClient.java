@@ -1,5 +1,9 @@
 package com.grublr.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grublr.rest.GrublrResponse;
+import com.grublr.rest.GrublrResponses;
+import com.grublr.util.Utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,9 +29,9 @@ public class SlimClient {
         //shareFood();
         //editFood();
         //deleteFood();
-        //findFood();
+        findFood();
         //signUp();
-        signIn();
+        //signIn();
     }
 
     private static void signIn() {
@@ -42,6 +46,8 @@ public class SlimClient {
 
         System.out.println(response.getStatus() + " "
                 + response.getStatusInfo() + " " + response);
+        Utils.sysout(response.getEntity());
+
     }
 
     private static void signUp() {
@@ -92,6 +98,13 @@ public class SlimClient {
 
         System.out.println(response.getStatus() + " "
                 + response.getStatusInfo() + " " + response);
+        GrublrResponses resps = response.readEntity(GrublrResponses.class);
+        final ObjectMapper mapper = new ObjectMapper();
+        Utils.sysout(mapper.writeValueAsString(resps));
+        for (GrublrResponse resp : resps.getResponses()) {
+            //Utils.sysout(mapper.writeValueAsString(resp));
+        }
+        // Utils.sysout(response.readEntity(GrublrResponses.class));
     }
 
     private static void editFood() throws IOException {

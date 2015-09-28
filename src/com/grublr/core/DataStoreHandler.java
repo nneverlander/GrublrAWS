@@ -15,4 +15,6 @@ public interface DataStoreHandler extends DataHandler {
     List<JsonNode> readMetaData(JsonNode inputJson) throws IOException, JSONException;
 
     void editMetaData(JsonNode entityObj) throws Exception;
+
+    void postTaken(JsonNode entityObj) throws Exception;
 }
