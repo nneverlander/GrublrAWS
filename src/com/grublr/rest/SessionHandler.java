@@ -27,7 +27,6 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -174,6 +173,9 @@ public class SessionHandler {
     public Response resetPassword(@PathParam("t") String token) {
         if (log.isLoggable(Level.INFO)) log.info("Reset password req received");
         try {
+            if (token == null || token.equals("")) {
+                return Response.ok(Constants.LINK_EXPIRED).build();
+            }
             if (!isLinkAlive(token)) {
                 return Response.ok(Constants.LINK_EXPIRED).build();
             }
@@ -238,22 +240,24 @@ public class SessionHandler {
 
     @Path("forgotPassword")
     @POST
-    public Response forgotPassword(@FormParam("email") String email) {
+    public Response forgotPassword(String jsonStr) {
         if (log.isLoggable(Level.INFO)) log.info("Forgot password req received");
         try {
-            if (!checkUserNameExists(email)) {
+            JsonNode node = Utils.stringToJson(jsonStr);
+            String userName = node.get(Constants.USERNAME_COL).asText();
+            if (!checkUserNameExists(userName)) {
                 return Response.ok(Constants.INVALID_USER).build();
             }
             // Check if token already exists and delete if it does
-            DynamoDBHandler.getInstance().deleteExistingPassWordResetTokens(email);
+            DynamoDBHandler.getInstance().deleteExistingPassWordResetTokens(userName);
 
-            String token = Utils.generateUniqueString(email);
+            String token = Utils.generateUniqueString(userName);
             token = new String(Base64.encodeBase64(token.getBytes()));
             Calendar expiry = Calendar.getInstance();
             expiry.add(Calendar.HOUR, 1); // Token expires in an hour
-            DynamoDBHandler.getInstance().setPasswordResetToken(token, email, expiry.getTimeInMillis()); // Create entry in db
+            DynamoDBHandler.getInstance().setPasswordResetToken(token, userName, expiry.getTimeInMillis()); // Create entry in db
             // Send email to user with password reset link
-            sendEmail(token, email);
+            sendEmail(token, userName);
             return Response.ok("ok").build();
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);

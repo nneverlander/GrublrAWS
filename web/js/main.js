@@ -1,6 +1,6 @@
 $( document ).ready(function() {
     $("#emailSent").hide();
-    $("#noEmailFound").hide();
+    $("#flashError").hide();
     $("#passwordChangeSuccess").hide();
 });
 
@@ -9,46 +9,39 @@ function emailSent() {
     $("#emailSent").show();
 }
 
-function emailNotFoundClose() {
-    $("#noEmailFound").hide();
-}
-
 function checkEmail(email) {
     $.ajax({
         method: "POST",
         url: "r/accounts/forgotPassword",
-        data: { email : email },
+        data: { userName : email },
         success: function(result) {
             if (result == 'ok') {
                 emailSent();
             } else {
-                $("#noEmailFound").show();
+                $("#flashError").show();
             }
         },
         error: function() {
-            $('#notifText').text('An error occurred');
-            $("#noEmailFound").show();
+            $('#notifText').text('An error occurred. Please try again.');
+            $("#flashError").show();
         }
     });
 }
 
-function validatePassword(confirmPassword){
-    alert(confirmPassword + "::" + $('#password_confirmation').val());
-    console.log(confirmPassword + "::" + $('#password_confirmation').val());
-    if(confirmPassword != $('#password_confirmation').val()) {
+function validatePassword(confirmPassword, user){
+    if($('#password').val() != confirmPassword.value) {
         confirmPassword.setCustomValidity("Passwords don't match");
     } else {
-        confirmPassword.setCustomValidity('');
+        confirmPassword.setCustomValidity("");
         $.ajax({
             method: "POST",
             url: "r/accounts/changePassword",
-            data: { passwd : confirmPassword },
+            data: { userName : user, password : confirmPassword.value },
             success: function(result) {
                 $("#passwordChangeSuccess").show();
             },
             error: function() {
-                $('#notifText').text('An error occurred');
-                $("#noEmailFound").show();
+                $("#flashError").show();
             }
         });
     }

@@ -11,11 +11,11 @@
 
 <body>
 
-<div id="noEmailFound">
+<div id="flashError">
     <div class="flash-error">
         <div class="container" id="notifText">
-            Can't find that email, sorry.
-            <button class="flash-close" onclick="emailNotFoundClose()"></button>
+            An error occured. Please try again.
+            <button class="flash-close" onclick="$('#flashError').hide()"></button>
         </div>
     </div>
 </div>
@@ -23,7 +23,7 @@
 <div role="main" class="main-content">
 
     <div class="auth-form">
-        <form id="enterPasswordForm"  method="post">
+        <form id="enterPasswordForm">
             <div class="auth-form-header">
                 <h1>Enter new password for ${requestScope.user}</h1>
             </div>
@@ -37,7 +37,8 @@
                 <input class="input-block change-password" id="password_confirmation" name="password_confirmation" tabindex="2"
                         type="password" required>
 
-                <input class="btn" name="commit" tabindex="3" type="submit" value="Change password" onclick="validatePassword('llllk')">
+                <input class="btn" name="commit" tabindex="3" type="submit" value="Change password"
+                       onclick="validatePassword(document.getElementById('password_confirmation'), ${requestScope.user})">
             </div>
         </form>
     </div>

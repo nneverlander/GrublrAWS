@@ -11,11 +11,11 @@
 
 <body>
 
-<div id="noEmailFound">
+<div id="flashError">
     <div class="flash-error">
         <div class="container" id="notifText">
             Can't find that email, sorry.
-            <button class="flash-close" onclick="emailNotFoundClose()"></button>
+            <button class="flash-close" onclick="$('#flashError').hide()"></button>
         </div>
     </div>
 </div>
@@ -23,7 +23,7 @@
 <div role="main" class="main-content">
 
     <div class="auth-form"id="enterEmail">
-        <form id="forgotPasswordForm" method="post">
+        <form id="forgotPasswordForm">
             <div class="auth-form-header">
                 <h1>Forgot password</h1>
             </div>

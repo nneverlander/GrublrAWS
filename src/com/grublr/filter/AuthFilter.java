@@ -1,5 +1,6 @@
 package com.grublr.filter;
 
+import com.grublr.core.DynamoDBHandler;
 import com.grublr.util.Constants;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -30,11 +31,15 @@ public class AuthFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
+        String token = req.getAttribute(Constants.TOKEN_COL).toString();
 
-        if (req.getAttribute(Constants.TOKEN_COL) == null || req.getAttribute(Constants.TOKEN_COL).equals("")) {
+        boolean isTokenAlive = DynamoDBHandler.getInstance().isPasswordTokenValid(token);
+
+        if (token == null || token.equals("") || !isTokenAlive) {
             resp.sendRedirect("/index.jsp");
             return;
         }
+
         chain.doFilter(request, response);
     }
 
