@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 
 <head>
@@ -24,7 +25,7 @@
     <div class="auth-form">
         <form id="enterPasswordForm"  method="post">
             <div class="auth-form-header">
-                <h1>Enter new password for </h1>
+                <h1>Enter new password for ${requestScope.user}</h1>
             </div>
             <div class="auth-form-body">
                 <p class="note">Password must at least 8 characters long.</p>

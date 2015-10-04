@@ -25,4 +25,13 @@
         <url-pattern>/r/*</url-pattern>
     </servlet-mapping>
 
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>com.grublr.filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/jsp/secure/*</url-pattern>
+    </filter-mapping>
+
 </web-app>

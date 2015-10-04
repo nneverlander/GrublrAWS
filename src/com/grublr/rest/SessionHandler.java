@@ -171,7 +171,7 @@ public class SessionHandler {
 
     @Path("resetPassword")
     @POST
-    public Response resetPassword(@PathParam("t") String token, String jsonStr) {
+    public Response resetPassword(@PathParam("t") String token) {
         if (log.isLoggable(Level.INFO)) log.info("Reset password req received");
         try {
             if (!isLinkAlive(token)) {
@@ -182,7 +182,9 @@ public class SessionHandler {
             if (user == null) {
                 return Response.ok(Constants.LINK_EXPIRED).build();
             }
-            changePassword(jsonStr);
+            request.setAttribute(Constants.USER_COL, user);
+            request.setAttribute(Constants.TOKEN_COL, token);
+            request.getRequestDispatcher("/jsp/secure/cp.jsp").forward(request, response);
             return Response.ok(user).build();
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -228,25 +230,10 @@ public class SessionHandler {
     public void forgotPass() {
         if (log.isLoggable(Level.INFO)) log.info("Forgot pass req received");
         try {
-            request.getRequestDispatcher("/j/fp.jsp").forward(request, response);
-            //return new Viewable("/j/cp.jsp");
+            request.getRequestDispatcher("/jsp/fp.jsp").forward(request, response);
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        //return null;
-    }
-
-    @Path("changePass")
-    @GET
-    public void changePass() {
-        if (log.isLoggable(Level.INFO)) log.info("Change pass req received");
-        try {
-            request.getRequestDispatcher("/j/cp.jsp").forward(request, response);
-            //return new Viewable("/j/cp.jsp");
-        } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        //return null;
     }
 
     @Path("forgotPassword")
