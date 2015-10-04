@@ -24,6 +24,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -31,6 +33,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
@@ -43,6 +46,10 @@ public class SessionHandler {
 
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
     private static Properties mailServerProperties = null;
+    @Context
+    private HttpServletRequest request;
+    @Context
+    private HttpServletResponse response;
 
     @POST
     @Path("signup")
@@ -163,8 +170,8 @@ public class SessionHandler {
     }
 
     @Path("resetPassword")
-    @GET
-    public Response resetPassword(@PathParam("t") String token) {
+    @POST
+    public Response resetPassword(@PathParam("t") String token, String jsonStr) {
         if (log.isLoggable(Level.INFO)) log.info("Reset password req received");
         try {
             if (!isLinkAlive(token)) {
@@ -175,6 +182,7 @@ public class SessionHandler {
             if (user == null) {
                 return Response.ok(Constants.LINK_EXPIRED).build();
             }
+            changePassword(jsonStr);
             return Response.ok(user).build();
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -186,12 +194,12 @@ public class SessionHandler {
         return DynamoDBHandler.getInstance().isPasswordTokenValid(token);
     }
 
-    @Path("submitResetPassword")
+    @Path("changePassword")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response submitResetPassword(String jsonStr) {
-        if (log.isLoggable(Level.INFO)) log.info("Submit Reset password req received");
+    public Response changePassword(String jsonStr) {
+        if (log.isLoggable(Level.INFO)) log.info("Change password req received");
         try {
             JsonNode node = Utils.stringToJson(jsonStr);
             String userName = node.get(Constants.USERNAME_COL).asText();
@@ -215,6 +223,32 @@ public class SessionHandler {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
+    @Path("forgotPass")
+    @GET
+    public void forgotPass() {
+        if (log.isLoggable(Level.INFO)) log.info("Forgot pass req received");
+        try {
+            request.getRequestDispatcher("/j/fp.jsp").forward(request, response);
+            //return new Viewable("/j/cp.jsp");
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        //return null;
+    }
+
+    @Path("changePass")
+    @GET
+    public void changePass() {
+        if (log.isLoggable(Level.INFO)) log.info("Change pass req received");
+        try {
+            request.getRequestDispatcher("/j/cp.jsp").forward(request, response);
+            //return new Viewable("/j/cp.jsp");
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        //return null;
+    }
+
     @Path("forgotPassword")
     @POST
     public Response forgotPassword(@FormParam("email") String email) {
@@ -233,7 +267,7 @@ public class SessionHandler {
             DynamoDBHandler.getInstance().setPasswordResetToken(token, email, expiry.getTimeInMillis()); // Create entry in db
             // Send email to user with password reset link
             sendEmail(token, email);
-            return Response.ok().build();
+            return Response.ok("ok").build();
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
