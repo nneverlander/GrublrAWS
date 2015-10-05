@@ -179,7 +179,7 @@ public class SessionHandler {
             if (!isLinkAlive(token)) {
                 return Response.ok(Constants.LINK_EXPIRED).build();
             }
-            // Check if token already exists and delete if it does
+            // Get user for token
             String user = DynamoDBHandler.getInstance().getUserForToken(token);
             if (user == null) {
                 return Response.ok(Constants.LINK_EXPIRED).build();
@@ -216,6 +216,12 @@ public class SessionHandler {
             // Update user information in the database
             boolean result = DynamoDBHandler.getInstance().updateUserPassword(userName, encryptPassStr, saltStr);
             if (result) {
+                // If its a reset password, delete token from password reset table
+                try {
+                    DynamoDBHandler.getInstance().deleteExistingPassWordResetTokens(userName);
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
                 String retJson = "{ " + Constants.USERNAME_COL + " : " + userName + " }";
                 return Response.ok(retJson).build();
             }
@@ -224,6 +230,7 @@ public class SessionHandler {
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
+
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
@@ -249,7 +256,11 @@ public class SessionHandler {
                 return Response.ok(Constants.INVALID_USER).build();
             }
             // Check if token already exists and delete if it does
-            DynamoDBHandler.getInstance().deleteExistingPassWordResetTokens(userName);
+            try {
+                DynamoDBHandler.getInstance().deleteExistingPassWordResetTokens(userName);
+            } catch (Exception e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
 
             String token = Utils.generateUniqueString(userName);
             token = new String(Base64.encodeBase64(token.getBytes()));
