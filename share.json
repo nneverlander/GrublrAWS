@@ -1,6 +1,7 @@
 {
-  "name" : "aisha1",
+  "name" : "today",
   "lat" : 43.0664146,
-  "lon" : -89.3890478,
-  "desc" : "movie"
+  "lng" : -89.3890478,
+  "desc" : "movie",
+  "tags" : "uw, italian,pizza"
 }

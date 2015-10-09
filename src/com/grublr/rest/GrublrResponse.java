@@ -18,8 +18,11 @@ public class GrublrResponse {
     private String name;
     private String desc;
     private String lat;
-    private String lon;
+    private String lng;
     private String imageUrl;
+    private String distance;
+    private String tags;
+    private String endTime;
 
     public GrublrResponse() {
 
@@ -57,12 +60,12 @@ public class GrublrResponse {
         this.lat = lat;
     }
 
-    public String getLon() {
-        return lon;
+    public String getLng() {
+        return lng;
     }
 
-    public void setLon(String lon) {
-        this.lon = lon;
+    public void setLng(String lng) {
+        this.lng = lng;
     }
 
     public String getImageUrl() {
@@ -71,6 +74,30 @@ public class GrublrResponse {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     @Override

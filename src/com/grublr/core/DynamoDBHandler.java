@@ -1,6 +1,6 @@
 package com.grublr.core;
 
-import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeAction;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
@@ -50,10 +50,10 @@ public class DynamoDBHandler implements DataStoreHandler {
     private static DynamoDBHandler instance;
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
 
-    //static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
-    //private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(creds);
+    static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
+    private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(creds); // TODO change this
 
-    private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
+    //private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
     private static final GeoDataManagerConfiguration config = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_IMAGE_METADATA_TABLE);
     private static final GeoDataManagerConfiguration inActivePostsConfig = new GeoDataManagerConfiguration(dbClient, Constants.DYNAMO_DB_INACTIVE_POSTS_TABLE);
     private static final GeoDataManager geoDataManager = new GeoDataManager(config);

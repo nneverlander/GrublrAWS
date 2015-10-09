@@ -1,5 +1,6 @@
 package com.grublr.core;
 
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
@@ -39,12 +40,12 @@ public class S3Handler implements PhotoHandler {
 
     private static final Logger log = Logger.getLogger(S3Handler.class.getName());
 
-    //static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
-    //private static final AmazonS3 s3Client = new AmazonS3Client(creds);
+    static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
+    private static final AmazonS3 s3Client = new AmazonS3Client(creds); // TODO change this
 
     private static final InstanceProfileCredentialsProvider credentials = new InstanceProfileCredentialsProvider();
 
-    private static final AmazonS3 s3Client = new AmazonS3Client(credentials);
+    //private static final AmazonS3 s3Client = new AmazonS3Client(credentials);
     private static final TransferManager transferMgr = new TransferManager(credentials);
     private static final AmazonGlacierClient glacierClient = new AmazonGlacierClient(credentials);
     private static final ArchiveTransferManager atm = new ArchiveTransferManager(glacierClient, credentials);

@@ -58,6 +58,7 @@ public class FoodHandler {
             String retJson = "{ " + Constants.UNIQUE_NAME + ":" + uniqueName + " }";
             return Response.ok(retJson).build();
         } catch (Exception e) {
+            e.printStackTrace();
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -180,6 +181,7 @@ public class FoodHandler {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log.log(Level.SEVERE, e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }

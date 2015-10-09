@@ -24,7 +24,7 @@ public class Utils {
     private static final Logger log = Logger.getLogger(Utils.class.getName());
 
     static {
-        System.setProperty("java.util.logging.config.file", "/logging.properties");
+        //System.setProperty("java.util.logging.config.file", "/logging.properties");
     }
 
     public static JsonNode stringToJson(String str) throws IOException {
