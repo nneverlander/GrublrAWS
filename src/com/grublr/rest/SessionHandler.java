@@ -1,7 +1,7 @@
 package com.grublr.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.grublr.core.DynamoDBHandler;
+import com.grublr.db.DynamoDBHandler;
 import com.grublr.util.Constants;
 import com.grublr.util.Utils;
 import java.io.IOException;
@@ -43,7 +43,7 @@ import org.apache.commons.codec.binary.Base64;
 @Path("/accounts")
 public class SessionHandler {
 
-    private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
+    private static final Logger log = Logger.getLogger(SessionHandler.class.getName());
     private static Properties mailServerProperties = null;
     @Context
     private HttpServletRequest request;

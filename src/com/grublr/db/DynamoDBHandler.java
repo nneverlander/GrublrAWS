@@ -1,4 +1,4 @@
-package com.grublr.core;
+package com.grublr.db;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
@@ -15,6 +15,7 @@ import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 import com.amazonaws.util.json.JSONException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.grublr.core.DataStoreHandler;
 import com.grublr.geo.GeoDataManager;
 import com.grublr.geo.GeoDataManagerConfiguration;
 import com.grublr.geo.model.DeletePointRequest;
@@ -51,6 +52,7 @@ public class DynamoDBHandler implements DataStoreHandler {
     private static final Logger log = Logger.getLogger(DynamoDBHandler.class.getName());
 
     static final BasicAWSCredentials creds = new BasicAWSCredentials("AKIAIU73ACJOOPMIRWYA", "Cmc/wcAVeLzUEAZWUIr0luVA6jHbXQGbjIJkRKUV");
+
     private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(creds); // TODO change this
 
     //private static final AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(new InstanceProfileCredentialsProvider());
@@ -68,6 +70,10 @@ public class DynamoDBHandler implements DataStoreHandler {
             instance = new DynamoDBHandler();
         }
         return instance;
+    }
+
+    public static AmazonDynamoDBClient getDbClient() {
+        return dbClient;
     }
 
     public boolean addUser(String userName, String password, String salt) throws Exception {

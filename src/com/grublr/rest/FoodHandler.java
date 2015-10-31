@@ -3,6 +3,8 @@ package com.grublr.rest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.grublr.core.DataHandlerFactory;
+import com.grublr.pojo.GrublrResponse;
+import com.grublr.pojo.GrublrResponses;
 import com.grublr.util.Constants;
 import com.grublr.util.Utils;
 import java.io.InputStream;

@@ -1,6 +1,6 @@
 package com.grublr.filter;
 
-import com.grublr.core.DynamoDBHandler;
+import com.grublr.db.DynamoDBHandler;
 import com.grublr.util.Constants;
 import java.io.IOException;
 import java.util.logging.Logger;

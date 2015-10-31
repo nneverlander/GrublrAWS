@@ -1,4 +1,4 @@
-package com.grublr.rest;
+package com.grublr.pojo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.grublr.util.Utils;

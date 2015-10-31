@@ -1,4 +1,4 @@
-package com.grublr.rest;
+package com.grublr.pojo;
 
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;

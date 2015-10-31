@@ -1,8 +1,8 @@
 package com.grublr.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grublr.rest.GrublrResponse;
-import com.grublr.rest.GrublrResponses;
+import com.grublr.pojo.GrublrResponse;
+import com.grublr.pojo.GrublrResponses;
 import com.grublr.util.Utils;
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,10 +26,10 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 public class SlimClient {
 
     public static void main(String[] args) throws IOException {
-        shareFood();
+        //shareFood();
         //editFood();
         //deleteFood();
-        findFood();
+        //findFood();
         //signUp();
         //signIn();
     }
